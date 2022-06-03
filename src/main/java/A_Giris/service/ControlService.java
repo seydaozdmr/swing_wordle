@@ -1,5 +1,6 @@
 package A_Giris.service;
 
+import A_Giris.model.Timer;
 import A_Giris.model.User;
 import A_Giris.model.WordlPuzzle;
 
@@ -18,6 +19,8 @@ import java.util.*;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class ControlService {
     private JButton tempButton;
@@ -33,7 +36,7 @@ public class ControlService {
     }
     private static int [] keyboard=  {69,82,84,89,85,73,79,80,286,220,65,83,68,70,71,72,74,75,76,350,304,10,90,67,86,66,78,77,214,199,8};
     private static int [] lowerKeyboard= {101,114,116,121,117,305,111,112,287,252,97,115,100,102,103,104,106,107,108,351,105,10,122,120,99,118,98,110,109,246,231,8};
-
+    private static boolean flag=true;
 
     public void setRoundCounter(AtomicInteger roundCounter) {
         this.roundCounter = roundCounter;
@@ -256,20 +259,133 @@ public class ControlService {
     public static JButton[] createButtonsForKeyBoard(JLabel[] myArray, JButton[] buttons, JFrame jFrame, ControlService controlService, WordlPuzzle puzzle,User user1,User user2){
         int x=10;
         int y=10;
+        //TODO BURASI saniyeleri sayan ve aktif kullanıcının değiştiği bölüm
+        //TODO Bunun yanında aktif olan kullanıcıyı check yapan ve yeşil yanmasını sağlayan thread yaratılmalı
+        Timer timer=new Timer();
+        AtomicBoolean isSwitch=new AtomicBoolean(false);
+        Thread t1=new Thread(new Runnable() {
+            void switchActiveUser(){
+                if(user1.isActive()){
+                    user2.setActive(true);
+                    user1.setActive(false);
+                }else if(user2.isActive()){
+                    user2.setActive(false);
+                    user1.setActive(true);
+                }
+
+            }
+            @Override
+            public void run() {
+                while(!controlService.getFinishedRound().get()){
+                    for(int i=0;i<30;i++){
+                        if(!isSwitch.get()){
+                            System.out.println(timer.incrementTimer());
+                            if(user2!=null){
+                                switchActiveUser();
+                            }
+
+                            try {
+                                Thread.sleep(1000);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }else{
+                            try {
+                                Thread.sleep(1000);
+                                timer.reset();
+                                isSwitch.set(false);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                    }
+                    try {
+                        timer.reset();
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            }
+        });
+
+
+        //two threads run respectively
+//        Timer timer=new Timer();
+//        ReentrantLock lock = new ReentrantLock();
+//        Condition condition = lock.newCondition();
+//        Thread t1=new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//
+//                for(int i=0;i<3;i++) {
+//                    lock.lock();
+//                    while (flag == false) {
+//                        try {
+//                            for(int j=0;j<30;j++){
+//                                System.out.println(Thread.currentThread().getName() + " : " + timer.incrementTimer());
+//                                Thread.sleep(1000);
+//                            }
+//                            condition.await();  // wait until thread2 set true
+//                        } catch (InterruptedException e) {
+//                        }
+//                    }
+//                    flag = false;
+//                    condition.signalAll();
+//                    timer.reset();
+//                    lock.unlock();
+//                }
+//
+//            }
+//        });
+//
+//        Thread t2=new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//
+//                for(int i=0;i<3;i++){
+//                    lock.lock();
+//                    while (flag == true) {
+//                        try {
+//                            for(int j=0;j<30;j++){
+//                                System.out.println(Thread.currentThread().getName() + " : " + timer.incrementTimer());
+//                                Thread.sleep(1000);
+//                            }
+//                            condition.await();  // wait until thread2 set true
+//                        } catch (InterruptedException e) {
+//                        }
+//                    }
+//                    flag = true;
+//                    condition.signalAll();
+//                    timer.reset();
+//                    lock.unlock();
+//                }
+//            }
+//        });
+//        t1.start();
+//        t2.start();
+        //Burada switch gelecek
+        t1.start();
         for(int i=0;i<31;i++){
             if(i<=9){
                 buttons[i] = new JButton(String.valueOf((char) keyboard[i]));
                 buttons[i].setBounds(x + i*50,y,50,30);
                 buttons[i].setLocale(Locale.getDefault());
                 JButton temp=buttons[i];
+
                 //Klavye tuşlarını dinleyen KeyListener
                 buttons[i].addKeyListener(new KeyListener() {
+
+
                     @Override
                     public void keyTyped(KeyEvent e) {
                     }
                     @Override
                     public void keyPressed(KeyEvent e) {
                         //TODO oyun bittiğinde yeni bir event alma game is over...
+
                         if(!controlService.getFinishedRound().get()){
                             if(e.getKeyCode()==8 && controlService.getLabelCounter()!=0){
                                 JLabel lastModified= controlService.getLastJLabel();
@@ -320,6 +436,9 @@ public class ControlService {
                                             }
                                         }
                                     }
+                                    //sıra diğer kullanıcıya geçer.
+                                    if(user2!=null)
+                                        isSwitch.set(true);
                                     puzzle.calculateScore(puzzle.getMatches(),puzzle.getNotMatchesWords());
                                     System.out.println("skor : "+user1.getScore());
                                 }

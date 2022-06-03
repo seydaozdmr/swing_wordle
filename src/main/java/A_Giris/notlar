@@ -15,7 +15,7 @@
    + iki oyuncudan aktif olanı oyun başında seçiliyor
    + iki tane thread oluyor birinin süresi dolunca sırayı ona veriyor ve sıra değişiyor.
    + kazanan yazılıyor ekrana
-
+    + Aktif kullanıcıyı belirlemek için 2 thread yarattık ve sırasıyla çalışıyor.....
 12-Visitors can watch the game(minimum criteria for 3 people group).
 13-You need to load high score information from a file.
 14-You need store and show detailed statistics about user letter usage.

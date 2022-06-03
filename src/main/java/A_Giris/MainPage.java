@@ -97,7 +97,7 @@ public class MainPage extends JFrame{
 
         JButton button=new JButton("Başla");
         button.setBounds(150,340,100,30);
-        
+
         button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -106,29 +106,37 @@ public class MainPage extends JFrame{
                 if(userName.getText().length()==0){
                     GameService.showWarning("kullanıcı adı boş olamaz");
                 }else{
-                    gameUser.setUserName(userName.getText());
-                    gameUser.setScore(500);
+                    if( bg2.getSelection().getActionCommand().charAt(0)=='m' && userName2.getText().length()==0){
+                        GameService.showWarning("kullanıcı adı boş olamaz");
+                    }else {
+                        gameUser.setUserName(userName.getText());
+                        gameUser.setScore(500);
+                        gameUser2.setUserName(userName2.getText());
+                        gameUser.setScore(500);
 
-                    if(bg.getSelection().getActionCommand().charAt(0)=='f'){
-                        gameUser.setGameControls(GameControls.MOUSE);
-                    }else{
-                        gameUser.setGameControls(GameControls.KEYBOARD);
-                    }
-                    //TODO Oynama şekli klavye fare belirlenecek?
-                    WordlGameFactory factory=new WordleGameFactoryWithKeyboard();
-                    WordlGameFactory mauseFactory=new WordleGameFactoryWithMouse();
-                    if(gameUser.getGameControls()==GameControls.KEYBOARD && bg2.getSelection().getActionCommand().charAt(0)=='s'){
-                        WordleGameWithKeyboard wordleGameWithKeyboard = (WordleGameWithKeyboard) factory.createSingleWordleGame(gameUser);
-                        wordleGameWithKeyboard.setVisible(true);
-                    }else if(gameUser.getGameControls()==GameControls.MOUSE && bg2.getSelection().getActionCommand().charAt(0)=='s'){
-                        WordleGameWithMouse wordleGameWithMouse=(WordleGameWithMouse) mauseFactory.createSingleWordleGame(gameUser);
-                        wordleGameWithMouse.setVisible(true);
-                    }else if(gameUser.getGameControls()==GameControls.MOUSE && bg2.getSelection().getActionCommand().charAt(0)=='m'){
-                        WordleGameWithKeyboard wordleGameWithKeyboard=(WordleGameWithKeyboard) factory.createMultiplayerWordleGame(user)
-                    }
-                     //new WordleGame(gameUser);
+                        if(bg.getSelection().getActionCommand().charAt(0)=='f'){
+                            gameUser.setGameControls(GameControls.MOUSE);
+                        }else{
+                            gameUser.setGameControls(GameControls.KEYBOARD);
+                        }
+                        //TODO Oynama şekli klavye fare belirlenecek?
+                        WordlGameFactory factory=new WordleGameFactoryWithKeyboard();
+                        WordlGameFactory mauseFactory=new WordleGameFactoryWithMouse();
+                        if(gameUser.getGameControls()==GameControls.KEYBOARD && bg2.getSelection().getActionCommand().charAt(0)=='s'){
+                            WordleGameWithKeyboard wordleGameWithKeyboard = (WordleGameWithKeyboard) factory.createSingleWordleGame(gameUser);
+                            wordleGameWithKeyboard.setVisible(true);
+                        }else if(gameUser.getGameControls()==GameControls.MOUSE && bg2.getSelection().getActionCommand().charAt(0)=='s'){
+                            WordleGameWithMouse wordleGameWithMouse=(WordleGameWithMouse) mauseFactory.createSingleWordleGame(gameUser);
+                            wordleGameWithMouse.setVisible(true);
+                        }else if(gameUser.getGameControls()==GameControls.KEYBOARD && bg2.getSelection().getActionCommand().charAt(0)=='m'){
+                            MultiplayerWordleGameWithKeyboard multiplayerWordleGameWithKeyboard=(MultiplayerWordleGameWithKeyboard) factory.createMultiplayerWordleGame(gameUser,gameUser2);
+                            multiplayerWordleGameWithKeyboard.setVisible(true);
+                        }
+                        //new WordleGame(gameUser);
 
-                    dispose();
+                        dispose();
+                    }
+
                 }
 
 

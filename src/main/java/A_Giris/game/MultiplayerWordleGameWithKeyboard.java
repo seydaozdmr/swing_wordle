@@ -7,10 +7,13 @@ import A_Giris.service.ControlService;
 import javax.swing.*;
 import java.io.IOException;
 import java.util.Random;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class MultiplayerWordleGameWithKeyboard extends JFrame implements MultiPlayerGame {
     private static User user1;
     private static User user2;
+    static boolean flag = true;
 
     public static void main(String[] args) {
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -40,13 +43,21 @@ public class MultiplayerWordleGameWithKeyboard extends JFrame implements MultiPl
         jFrame.setTitle("Wordle Game");
         jFrame.setSize(800 ,800);
         jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        int chooseActiveUser= new Random().nextInt(3);
+        int chooseActiveUser= new Random().nextInt(2);
         System.out.println(chooseActiveUser);
+        if(chooseActiveUser==0){
+            user1.setActive(true);
+        }else{
+            user2.setActive(true);
+        }
+
+
         JButton [] buttons=new JButton[31];
         buttons=ControlService.createButtonsForKeyBoard(labels,buttons,jFrame,controlService,puzzle,user1,user2);
         //TODO kullanıcılardan birini aktif olarak seçiyor ve 30 saniye süre veriyor süre bitince diğerine sıra geçiyor
-        jFrame.setLayout(null);
 
+
+        jFrame.setLayout(null);
     }
 
 
