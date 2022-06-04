@@ -122,6 +122,9 @@ public class MainPage extends JFrame{
                         }else if(gameUser.getGameControls()==GameControls.KEYBOARD && bg2.getSelection().getActionCommand().charAt(0)=='m'){
                             MultiplayerWordleGameWithKeyboard multiplayerWordleGameWithKeyboard=(MultiplayerWordleGameWithKeyboard) factory.createMultiplayerWordleGame(gameUser,gameUser2);
                             multiplayerWordleGameWithKeyboard.setVisible(true);
+                        }else if(gameUser.getGameControls()==GameControls.MOUSE && bg2.getSelection().getActionCommand().charAt(0)=='m'){
+                            MultiPlayerWordleGameWithMouse multiPlayerWordleGameWithMouse=(MultiPlayerWordleGameWithMouse) mauseFactory.createMultiplayerWordleGame(gameUser,gameUser2);
+                            multiPlayerWordleGameWithMouse.setVisible(true);
                         }
                         dispose();
                     }
