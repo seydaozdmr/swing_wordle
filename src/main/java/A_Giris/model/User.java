@@ -2,11 +2,14 @@ package A_Giris.model;
 
 import A_Giris.model.GameControls;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 public class User {
     private String userName;
     private int score;
     private GameControls gameControls;
-    private boolean isActive;
+    //threadler aynı anda kullanırken senkronize olması açısından
+    private AtomicBoolean isActive = new AtomicBoolean(false);
 
     public User(String userName, int score) {
         this.userName = userName;
@@ -36,12 +39,12 @@ public class User {
         return gameControls;
     }
 
-    public boolean isActive() {
+    public AtomicBoolean getIsActive() {
         return isActive;
     }
 
-    public void setActive(boolean active) {
-        isActive = active;
+    public void setIsActive(AtomicBoolean isActive) {
+        this.isActive = isActive;
     }
 
     public void setGameControls(GameControls gameControls) {
