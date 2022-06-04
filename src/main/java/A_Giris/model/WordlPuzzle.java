@@ -10,6 +10,7 @@ public class WordlPuzzle {
     private boolean[] notMatchesWords;
     private String chosenWord;
     private Map<Character, Integer> notFoundChars;
+    //TODO skoru düzelt
     private User user1;
     private User user2;
 
@@ -24,6 +25,7 @@ public class WordlPuzzle {
         notMatchesWords = new boolean[5];
         notFoundChars = new HashMap<>();
     }
+
     public WordlPuzzle(User user1,User user2){
         this(user1);
         this.user2=user2;
@@ -76,16 +78,33 @@ public class WordlPuzzle {
         for(int i=0;i<5;i++){
             if(matches[i]){
                 //Bilinen kelimelere puan verilebilir
-                user1.setScore(user1.getScore());
-                continue;
+                if(user1.getIsActive().get()){
+                    user1.setScore(user1.getScore());
+                    continue;
+                }else if(user2.getIsActive().get()){
+                    user2.setScore(user2.getScore());
+                    continue;
+                }
+
             }
             if(notMatchesWords[i]){
-                user1.setScore(user1.getScore()-20);
-                continue;
+                if(user1.getIsActive().get()){
+                    user1.setScore(user1.getScore()-5);
+                    continue;
+                }else if(user2.getIsActive().get()){
+                    user2.setScore(user2.getScore()-5);
+                    continue;
+                }
+
             }
             if(!matches[i] && !notMatchesWords[i]){
-                user1.setScore(user1.getScore()-100);
-                continue;
+                if(user1.getIsActive().get()){
+                    user1.setScore(user1.getScore()-20);
+                    continue;
+                }else if(user2.getIsActive().get()){
+                    user2.setScore(user2.getScore()-20);
+                    continue;
+                }
             }
         }
     }
