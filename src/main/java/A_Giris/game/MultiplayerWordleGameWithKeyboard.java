@@ -5,7 +5,9 @@ import A_Giris.model.WordlPuzzle;
 import A_Giris.service.ControlService;
 
 import javax.swing.*;
+import java.awt.*;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
@@ -38,7 +40,8 @@ public class MultiplayerWordleGameWithKeyboard extends JFrame implements MultiPl
 
     private void createAndShowGui(WordlPuzzle puzzle, JFrame jFrame) throws IOException{
         ControlService controlService=new ControlService();
-        JLabel [] labels=ControlService.createLabelsForKeyBoard(jFrame);
+        Point labelsStartPoint=new Point(200,10);
+        JLabel [] labels=ControlService.createLabelsForKeyBoard(jFrame,labelsStartPoint);
 
         jFrame.setTitle("Wordle Game");
         jFrame.setSize(800 ,800);
@@ -46,16 +49,18 @@ public class MultiplayerWordleGameWithKeyboard extends JFrame implements MultiPl
         int chooseActiveUser= new Random().nextInt(2);
         System.out.println(chooseActiveUser);
         if(chooseActiveUser==0){
-            user1.setActive(true);
+            user1.getIsActive().set(true);
+            user2.getIsActive().set(false);
         }else{
-            user2.setActive(true);
+            user2.getIsActive().set(true);
+            user1.getIsActive().set(false);
         }
 
-
+        Point buttonsStartPoint=new Point(80,350);
         JButton [] buttons=new JButton[31];
-        buttons=ControlService.createButtonsForKeyBoard(labels,buttons,jFrame,controlService,puzzle,user1,user2);
+        buttons=ControlService.createButtonsForKeyBoard(labels,buttonsStartPoint,buttons,jFrame,controlService,puzzle,user1,user2);
         //TODO kullanıcılardan birini aktif olarak seçiyor ve 30 saniye süre veriyor süre bitince diğerine sıra geçiyor
-
+        ControlService.createUserInformations(jFrame,controlService,user1,user2);
 
         jFrame.setLayout(null);
     }
