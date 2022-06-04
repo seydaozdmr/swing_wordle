@@ -12,6 +12,6 @@ public class WordleGameFactoryWithMouse implements WordlGameFactory {
 
     @Override
     public MultiPlayerGame createMultiplayerWordleGame(User user1,User user2) {
-        return null;
+        return new MultiPlayerWordleGameWithMouse(user1,user2);
     }
 }
