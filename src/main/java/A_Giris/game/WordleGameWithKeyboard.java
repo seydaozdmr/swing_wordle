@@ -45,7 +45,7 @@ public class WordleGameWithKeyboard extends JFrame implements SingleWordleGame{
 
 
     }
-
+    @Override
     public void createAndShowGui(WordlPuzzle puzzle,JFrame jFrame) throws IOException {
         //bu sınıfın sahip olduğu bütün kontrolleri tutan getiren sınıf
         ControlService controlService=new ControlService();
@@ -61,6 +61,7 @@ public class WordleGameWithKeyboard extends JFrame implements SingleWordleGame{
         Point buttonsStartPoint=new Point(80,350);
         //buttons = createButtons(myArray,buttons,jFrame,controlService,puzzle);
         buttons= ControlService.createButtonsForKeyBoard(myArray,buttonsStartPoint,buttons,jFrame,controlService,puzzle,user,null);
+        user.getIsActive().set(true);
         ControlService.createUserInformations(jFrame,controlService,user,null);
         jFrame.setLayout(null);
         //jFrame.setVisible(true);
