@@ -15,7 +15,6 @@ import java.util.concurrent.locks.ReentrantLock;
 public class MultiplayerWordleGameWithKeyboard extends JFrame implements MultiPlayerGame {
     private static User user1;
     private static User user2;
-    static boolean flag = true;
 
     public static void main(String[] args) {
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -37,17 +36,17 @@ public class MultiplayerWordleGameWithKeyboard extends JFrame implements MultiPl
             e.printStackTrace();
         }
     }
-
-    private void createAndShowGui(WordlPuzzle puzzle, JFrame jFrame) throws IOException{
+    @Override
+    public void createAndShowGui(WordlPuzzle puzzle, JFrame jFrame) throws IOException{
         ControlService controlService=new ControlService();
         Point labelsStartPoint=new Point(200,10);
         JLabel [] labels=ControlService.createLabelsForKeyBoard(jFrame,labelsStartPoint);
 
-        jFrame.setTitle("Wordle Game");
+        jFrame.setTitle("MultiPlayer Wordle Game");
         jFrame.setSize(800 ,800);
         jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         int chooseActiveUser= new Random().nextInt(2);
-        System.out.println(chooseActiveUser);
+
         if(chooseActiveUser==0){
             user1.getIsActive().set(true);
             user2.getIsActive().set(false);
