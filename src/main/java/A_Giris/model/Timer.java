@@ -16,4 +16,8 @@ public class Timer {
     public void reset(){
         timer.set(0);
     }
+
+    public int getTime(){
+        return this.timer.get();
+    }
 }
