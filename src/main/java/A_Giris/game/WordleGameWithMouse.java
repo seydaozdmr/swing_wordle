@@ -5,6 +5,7 @@ import A_Giris.model.WordlPuzzle;
 import A_Giris.service.ControlService;
 
 import javax.swing.*;
+import java.awt.*;
 import java.io.IOException;
 
 public class WordleGameWithMouse extends JFrame implements SingleWordleGame {
@@ -36,7 +37,8 @@ public class WordleGameWithMouse extends JFrame implements SingleWordleGame {
     public void createAndShowGui(WordlPuzzle puzzle, JFrame jFrame) throws IOException {
         ControlService controlService=new ControlService();
         //label'ların olduğu dizi
-        JLabel [] myArray =controlService.createLabelsForMouse(jFrame,controlService);
+        Point labelsStartPoint=new Point(10,10);
+        JLabel [] myArray =controlService.createLabelsForMouse(jFrame,controlService,labelsStartPoint);
 
         jFrame.setTitle("Wordle Game");
         jFrame.setSize(800,800);
