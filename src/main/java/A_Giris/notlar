@@ -1,21 +1,21 @@
 1-Oyun bitecek (5 kere girildiğinde ya da tahmin doğruysa) -> Oyun bitiyor++++++++
-2-Giriş sayfası (oyuncu adı oynama şekli) ++++ burası yapılacak
+2-Giriş sayfası (oyuncu adı oynama şekli) ++++
 3-sürükle bırak şeklinde oynamak +++++
 4-zaman yazdırmak (Thread olarak başlamalı ve öylece sürmeli)
 5-iki kere aynı harf girişleri düzeltilmeli+++++++
 6-Oyun bitiminde animasyon---- ya da mesaj+++
 7-High score u bir dosyada tut++++(Bunun alt yapısı hazır)
 
-8-You need to load high score information from a file.
+8-You need to load high score information from a file.++++++++++
   • You need store and show detailed statistics about user letter usage.
 
-9-Oynama şekli bir kişilik ve iki kişilik
-10-iki kişi aynı anda aynı frame üzerinden bir bilgisayardan oynayacak
-11-Using multiple Threads
-   + iki oyuncudan aktif olanı oyun başında seçiliyor
-   + iki tane thread oluyor birinin süresi dolunca sırayı ona veriyor ve sıra değişiyor.
-   + kazanan yazılıyor ekrana
-    + Aktif kullanıcıyı belirlemek için 2 thread yarattık ve sırasıyla çalışıyor.....
-12-Visitors can watch the game(minimum criteria for 3 people group).
-13-You need to load high score information from a file.
-14-You need store and show detailed statistics about user letter usage.
+9-Oynama şekli bir kişilik ve iki kişilik ++++++++
+10-iki kişi aynı anda aynı frame üzerinden bir bilgisayardan oynayacak ++++++++++++
+11-Using multiple Threads +++++++++++
+   + iki oyuncudan aktif olanı oyun başında seçiliyor ++++++++++++
+   + iki tane thread oluyor birinin süresi dolunca sırayı ona veriyor ve sıra değişiyor. +++++++++
+   + kazanan yazılıyor ekrana +++++++++
+    + Aktif kullanıcıyı belirlemek için 2 thread yarattık ve sırasıyla çalışıyor..... ++++++++++
+12-Visitors can watch the game(minimum criteria for 3 people group). ------SOCKET
+13-You need to load high score information from a file. +++++++++
+14-You need store and show detailed statistics about user letter usage. ------YAPILACAK
