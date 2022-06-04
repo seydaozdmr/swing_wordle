@@ -37,6 +37,7 @@ public class ControlService {
     private static int [] keyboard=  {69,82,84,89,85,73,79,80,286,220,65,83,68,70,71,72,74,75,76,350,304,10,90,67,86,66,78,77,214,199,8};
     private static int [] lowerKeyboard= {101,114,116,121,117,305,111,112,287,252,97,115,100,102,103,104,106,107,108,351,105,10,122,120,99,118,98,110,109,246,231,8};
     private static boolean flag=true;
+    private Timer timer=new Timer();
 
     public void setRoundCounter(AtomicInteger roundCounter) {
         this.roundCounter = roundCounter;
@@ -110,6 +111,63 @@ public class ControlService {
 
     public void setFinishedRound(AtomicBoolean finishedRound) {
         this.finishedRound = finishedRound;
+    }
+
+    public static void createUserInformations(JFrame jFrame, ControlService controlService,User user1,User user2){
+        //TODO bunların x'i farklı olacak
+        JLabel user1Label=new JLabel("Oyuncu-1 : ");
+        user1Label.setBounds(10,510,50,20);
+        JLabel user1Details=new JLabel(user1.getUserName());
+        user1Details.setBounds(60,510,50,20);
+        JLabel user1Time=new JLabel("");
+        user1Time.setBounds(10,530,50,20);
+        JLabel user1Active = new JLabel("");
+        user1Active.setBounds(60,530,50,50);
+        user1Active.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
+        //TODO ikinci oyuncunun gelmediği durum ayarlanacak
+            JLabel user2Label=new JLabel("Oyuncu-2 : ");
+            user2Label.setBounds(150,510,100,20);
+            JLabel user2Details=new JLabel(" ");
+            user2Details.setBounds(250,510,250,20);
+            JLabel user2Time=new JLabel("");
+            user2Time.setBounds(150,530,100,20);
+            JLabel user2Active = new JLabel("");
+            user2Active.setBounds(250,530,50,50);
+            user2Active.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
+
+
+        Thread t1=new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while(!controlService.getFinishedRound().get()){
+                    if(user1.getIsActive().get()){
+                        user1Time.setText(String.valueOf(controlService.timer.getTime()));
+                        user1Active.setBorder(BorderFactory.createLineBorder(Color.GREEN));
+                        user2Active.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
+                    }else if(user2!=null && user2.getIsActive().get()){
+                        user2Time.setText(String.valueOf(controlService.timer.getTime()));
+                        user2Active.setBorder(BorderFactory.createLineBorder(Color.GREEN));
+                        user1Active.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
+                    }
+                }
+            }
+        });
+
+        t1.start();
+
+
+        jFrame.add(user1Label);
+        jFrame.add(user1Details);
+        jFrame.add(user1Time);
+        jFrame.add(user1Active);
+        if(user2!=null){
+            user2Details.setText(user2.getUserName());
+            jFrame.add(user2Label);
+            jFrame.add(user2Details);
+            jFrame.add(user2Time);
+            jFrame.add(user2Active);
+        }
+
     }
 
 
@@ -256,118 +314,68 @@ public class ControlService {
         return buttons;
     }
 
-    public static JButton[] createButtonsForKeyBoard(JLabel[] myArray, JButton[] buttons, JFrame jFrame, ControlService controlService, WordlPuzzle puzzle,User user1,User user2){
-        int x=10;
-        int y=10;
+    public static JButton[] createButtonsForKeyBoard(JLabel[] myArray,Point buttonsStartPoint, JButton[] buttons, JFrame jFrame, ControlService controlService, WordlPuzzle puzzle,User user1,User user2){
+        int x=buttonsStartPoint.x;
+        int y=buttonsStartPoint.y;
         //TODO BURASI saniyeleri sayan ve aktif kullanıcının değiştiği bölüm
         //TODO Bunun yanında aktif olan kullanıcıyı check yapan ve yeşil yanmasını sağlayan thread yaratılmalı
-        Timer timer=new Timer();
+       //Timer timer=controlService.timer;
         AtomicBoolean isSwitch=new AtomicBoolean(false);
+        //TODO RoundCount ve eğer hiç birşey girilmediyse bütün labelları kırmızı yap
         Thread t1=new Thread(new Runnable() {
             void switchActiveUser(){
-                if(user1.isActive()){
-                    user2.setActive(true);
-                    user1.setActive(false);
-                }else if(user2.isActive()){
-                    user2.setActive(false);
-                    user1.setActive(true);
+                if(user1.getIsActive().get()){
+                    user2.getIsActive().set(true);
+                    user1.getIsActive().set(false);
+                }else if(user2.getIsActive().get()){
+                    user2.getIsActive().set(false);
+                    user1.getIsActive().set(true);
                 }
-
             }
             @Override
             public void run() {
+                //TODO saymaya devam ediyor
                 while(!controlService.getFinishedRound().get()){
                     for(int i=0;i<30;i++){
                         if(!isSwitch.get()){
-                            System.out.println(timer.incrementTimer());
-                            if(user2!=null){
-                                switchActiveUser();
-                            }
-
+                            //switch değişmediği sürece timer arttır
+                            System.out.println(controlService.timer.incrementTimer());
                             try {
                                 Thread.sleep(1000);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
                         }else{
+                            //eğer switch true olursa
+                            if(user2!=null){
+                                switchActiveUser();
+                            }//önce aktif kullanıcıyı değiştir
                             try {
                                 Thread.sleep(1000);
-                                timer.reset();
+                                controlService.timer.reset();
                                 isSwitch.set(false);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
                         }
-
                     }
                     try {
-                        timer.reset();
+                        if(user2!=null){
+                            switchActiveUser();
+                        }
+                        //kaç round çalıştığı bilinmeli
+                        //controlService.getCount().incrementAndGet();
+                        isSwitch.set(false);
+                        controlService.timer.reset();
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-
                 }
             }
         });
-
-
-        //two threads run respectively
-//        Timer timer=new Timer();
-//        ReentrantLock lock = new ReentrantLock();
-//        Condition condition = lock.newCondition();
-//        Thread t1=new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//
-//                for(int i=0;i<3;i++) {
-//                    lock.lock();
-//                    while (flag == false) {
-//                        try {
-//                            for(int j=0;j<30;j++){
-//                                System.out.println(Thread.currentThread().getName() + " : " + timer.incrementTimer());
-//                                Thread.sleep(1000);
-//                            }
-//                            condition.await();  // wait until thread2 set true
-//                        } catch (InterruptedException e) {
-//                        }
-//                    }
-//                    flag = false;
-//                    condition.signalAll();
-//                    timer.reset();
-//                    lock.unlock();
-//                }
-//
-//            }
-//        });
-//
-//        Thread t2=new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//
-//                for(int i=0;i<3;i++){
-//                    lock.lock();
-//                    while (flag == true) {
-//                        try {
-//                            for(int j=0;j<30;j++){
-//                                System.out.println(Thread.currentThread().getName() + " : " + timer.incrementTimer());
-//                                Thread.sleep(1000);
-//                            }
-//                            condition.await();  // wait until thread2 set true
-//                        } catch (InterruptedException e) {
-//                        }
-//                    }
-//                    flag = true;
-//                    condition.signalAll();
-//                    timer.reset();
-//                    lock.unlock();
-//                }
-//            }
-//        });
-//        t1.start();
-//        t2.start();
-        //Burada switch gelecek
         t1.start();
+
         for(int i=0;i<31;i++){
             if(i<=9){
                 buttons[i] = new JButton(String.valueOf((char) keyboard[i]));
@@ -423,9 +431,19 @@ public class ControlService {
                                     for(JLabel elem: controlService.getWrittenLabels()){
                                         elem.setBorder(BorderFactory.createLineBorder(Color.GREEN));
                                     }
-                                    //Eğer aktif olan User1 ise User2 değilse user2
-                                    congratulations(user1);
-                                    FileService.writeScore(user1);
+                                    //TODO Eğer aktif olan User1 ise User2 değilse user2
+                                    if(user2==null){
+                                        congratulations(user1);
+                                        FileService.writeScore(user1);
+                                    }else{
+                                        if(user1.getIsActive().get()){
+                                            congratulations(user1);
+                                            FileService.writeScore(user1);
+                                        }else{
+                                            congratulations(user2);
+                                            FileService.writeScore(user2);
+                                        }
+                                    }
                                 }else{
                                     for(int i=0;i<puzzle.getMatches().length;i++){
                                         if(puzzle.getMatches()[i]==true){
@@ -437,8 +455,7 @@ public class ControlService {
                                         }
                                     }
                                     //sıra diğer kullanıcıya geçer.
-                                    if(user2!=null)
-                                        isSwitch.set(true);
+                                    isSwitch.set(true);
                                     puzzle.calculateScore(puzzle.getMatches(),puzzle.getNotMatchesWords());
                                     System.out.println("skor : "+user1.getScore());
                                 }
@@ -446,8 +463,19 @@ public class ControlService {
                                 controlService.getWrittenLabels().clear();
                                 if (controlService.getRoundCounter().get() == 5) {
                                     puzzle.calculateScore(puzzle.getMatches(),puzzle.getNotMatchesWords());
-                                    looseMessage(user1);
-                                    controlService.getFinishedRound().set(true);
+                                    if(user2==null){
+                                        looseMessage(user1);
+                                        controlService.getFinishedRound().set(true);
+                                    }else{
+                                        if(user1.getIsActive().get()){
+                                            looseMessage(user1);
+                                            controlService.getFinishedRound().set(true);
+                                        }else{
+                                            //TODO 2. oyuncunun skorunu düzelt
+                                            looseMessage(user2);
+                                            controlService.getFinishedRound().set(true);
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -458,17 +486,16 @@ public class ControlService {
                 });
                 jFrame.add(buttons[i]);
             }else{
-                y=50;
+
                 if(i<=20){
                     buttons[i] =new JButton(String.valueOf((char) keyboard[i]));
-                    buttons[i].setBounds(x + (i-10)*50 ,y,50,30);
+                    buttons[i].setBounds(x + (i-10)*50 ,y+50,50,30);
                     jFrame.add( buttons[i]);
 
                 }else{
-                    y=100;
                     if(!(keyboard[i]==10) && !(keyboard[i]==8)){
                         buttons[i] =new JButton(String.valueOf((char) keyboard[i]));
-                        buttons[i].setBounds(x+ (i-21)*50,y,50,30);
+                        buttons[i].setBounds(x+ (i-21)*50,y+100,50,30);
                         jFrame.add( buttons[i]);
                     }else if(keyboard[i]==10){
                         buttons[i] = new JButton("EN");
@@ -482,12 +509,12 @@ public class ControlService {
                         buttons[i].setBorderPainted(true);
                         buttons[i].setFocusPainted(true);
                         buttons[i].setContentAreaFilled(false);
-                        buttons[i].setBounds(x,y,50,30);
+                        buttons[i].setBounds(x,y+100,50,30);
                         jFrame.add(buttons[i]);
                     }else if(keyboard[i]==8){
                         //TODO BACKSPACE tuşu
                         buttons[i] =new JButton("<-");
-                        buttons[i].setBounds(x + (i-21)*50,y,50,30);
+                        buttons[i].setBounds(x + (i-21)*50,y+100,50,30);
                         jFrame.add(buttons[i]);
                     }
                 }
@@ -497,7 +524,7 @@ public class ControlService {
 
     }
 
-    public static JLabel[] createLabelsForKeyBoard (JFrame jFrame){
+    public static JLabel[] createLabelsForKeyBoard (JFrame jFrame,Point startPoint){
         JLabel [] myArray = new JLabel[25];
         int count =0;
         for(int i=0;i<5;i++) {
@@ -506,14 +533,14 @@ public class ControlService {
                 JLabel temp = myArray[count++];
                 Border blackline = BorderFactory.createLineBorder(Color.black);
                 temp.setBorder(blackline);
-                temp.setBounds(100 + j * 60, 200 + i * 60, 50, 50);
+                temp.setBounds((int)startPoint.getX() + j * 60, (int)startPoint.getY() + i * 60, 50, 50);
                 jFrame.add(temp);
             }
         }
         return myArray;
     }
 
-    public static JLabel[] createLabelsForMouse(JFrame jFrame,ControlService service){
+    public static JLabel[] createLabelsForMouse(JFrame jFrame,ControlService service,Point point){
         JLabel [] myArray = new JLabel[25];
         int count =0;
         for(int i=0;i<5;i++) {
@@ -522,7 +549,7 @@ public class ControlService {
                 JLabel temp = myArray[count++];
                 Border blackline = BorderFactory.createLineBorder(Color.black);
                 temp.setBorder(blackline);
-                temp.setBounds(100 + j * 60, 200 + i * 60, 50, 50);
+                temp.setBounds((int)point.getX() + j * 60, (int)point.getY() + i * 60, 50, 50);
                 temp.setTransferHandler(new ValueImportTransferHandler(myArray,service));
                 jFrame.add(temp);
             }
