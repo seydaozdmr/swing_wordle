@@ -12,27 +12,21 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class MainPage extends JFrame{
-
-
     public static void main(String[] args) {
 
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                MainPage mainPage=new MainPage();
+                MainPage mainPage = new MainPage();
                 mainPage.setVisible(true);
             }
         });
-
-
     }
 
     public MainPage(){
         setTitle("Wordle Game");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(500,500,700,500);
-
-
 
         JPanel panel = new JPanel();
         panel.setBorder(new EmptyBorder(5,5,5,5));
@@ -48,7 +42,6 @@ public class MainPage extends JFrame{
         userName2.setBounds(150,290,250,30);
         userName2.setEditable(false);
         panel.add(userName2);
-
 
         //TODO fare klavye
         JRadioButton rb1=new JRadioButton("Fare",true);
@@ -80,7 +73,6 @@ public class MainPage extends JFrame{
         bg2.add(rbSingle);
         bg2.add(rbMultiPlayer);
 
-
         JLabel o1=new JLabel("1- Oyuncu İsmi: ");
         o1.setBounds(150,190,250,20);
         JLabel o2=new JLabel("2- Oyuncu İsmi: ");
@@ -88,8 +80,6 @@ public class MainPage extends JFrame{
 
         panel.add(o1);
         panel.add(o2);
-
-
 
         ButtonGroup bg= new ButtonGroup();
         bg.add(rb1);
@@ -112,7 +102,7 @@ public class MainPage extends JFrame{
                         gameUser.setUserName(userName.getText());
                         gameUser.setScore(500);
                         gameUser2.setUserName(userName2.getText());
-                        gameUser.setScore(500);
+                        gameUser2.setScore(500);
 
                         if(bg.getSelection().getActionCommand().charAt(0)=='f'){
                             gameUser.setGameControls(GameControls.MOUSE);
@@ -123,6 +113,7 @@ public class MainPage extends JFrame{
                         WordlGameFactory factory=new WordleGameFactoryWithKeyboard();
                         WordlGameFactory mauseFactory=new WordleGameFactoryWithMouse();
                         if(gameUser.getGameControls()==GameControls.KEYBOARD && bg2.getSelection().getActionCommand().charAt(0)=='s'){
+                            gameUser.getIsActive().set(true);
                             WordleGameWithKeyboard wordleGameWithKeyboard = (WordleGameWithKeyboard) factory.createSingleWordleGame(gameUser);
                             wordleGameWithKeyboard.setVisible(true);
                         }else if(gameUser.getGameControls()==GameControls.MOUSE && bg2.getSelection().getActionCommand().charAt(0)=='s'){
@@ -132,28 +123,18 @@ public class MainPage extends JFrame{
                             MultiplayerWordleGameWithKeyboard multiplayerWordleGameWithKeyboard=(MultiplayerWordleGameWithKeyboard) factory.createMultiplayerWordleGame(gameUser,gameUser2);
                             multiplayerWordleGameWithKeyboard.setVisible(true);
                         }
-                        //new WordleGame(gameUser);
-
                         dispose();
                     }
-
                 }
-
-
             }
         });
         JLabel photo = new JLabel(new ImageIcon("images.png"));
         photo.setBounds(0,0,500,100);
         panel.add(photo);
-
         panel.add(button);
-
         panel.add(rb1);
         panel.add(rb2);
         panel.add(rbSingle);
         panel.add(rbMultiPlayer);
-//        f.setSize(400,500);
-//        f.setLayout(null);
-//        f.setVisible(true);
     }
 }
