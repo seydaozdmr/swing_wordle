@@ -15,9 +15,14 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.dnd.DnDConstants;
 import java.awt.event.*;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class WordleGameWithKeyboard extends JFrame implements SingleWordleGame{
     private static int [] keyboard=  {69,82,84,89,85,73,79,80,286,220,65,83,68,70,71,72,74,75,76,350,304,10,90,67,86,66,78,77,214,199,8};
@@ -33,7 +38,36 @@ public class WordleGameWithKeyboard extends JFrame implements SingleWordleGame{
                 wordleGameWithKeyboard.setVisible(true);
             }
         });
+
     }
+    //TODO Sending data to client
+    public void sendingDataToClient(JLabel[] myArray){
+        byte [] message= Arrays.stream(myArray).map(e->e.getText().getBytes(StandardCharsets.UTF_8)[0]).collect(toByteArray());
+        ServerSocket serverSocket = null;
+        try {
+            serverSocket = new ServerSocket(1234);
+            Socket socket = serverSocket.accept();
+            DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
+            dOut.writeInt(myArray.length);
+            dOut.write(message);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public static Collector<Byte, ?, byte[]> toByteArray() {
+        return Collector.of(ByteArrayOutputStream::new, ByteArrayOutputStream::write, (baos1, baos2) -> {
+            try {
+                baos2.writeTo(baos1);
+                return baos1;
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
+        }, ByteArrayOutputStream::toByteArray);
+    }
+
+
     public WordleGameWithKeyboard(User user){
         this.user=user;
         try {
@@ -45,6 +79,7 @@ public class WordleGameWithKeyboard extends JFrame implements SingleWordleGame{
 
 
     }
+
     @Override
     public void createAndShowGui(WordlPuzzle puzzle,JFrame jFrame) throws IOException {
         //bu sınıfın sahip olduğu bütün kontrolleri tutan getiren sınıf
@@ -52,6 +87,8 @@ public class WordleGameWithKeyboard extends JFrame implements SingleWordleGame{
         //label'ların olduğu dizi controle service'de yarattırıp alıyorum
         Point labelsStartPoint=new Point(200,10);
         JLabel [] myArray = controlService.createLabelsForKeyBoard(jFrame,labelsStartPoint);
+
+        sendingDataToClient(myArray);
         //jFrame ayarları
         jFrame.setTitle("Wordle Game");
         jFrame.setSize(800 ,800);
