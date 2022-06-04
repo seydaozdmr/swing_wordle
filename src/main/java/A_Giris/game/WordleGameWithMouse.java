@@ -37,15 +37,17 @@ public class WordleGameWithMouse extends JFrame implements SingleWordleGame {
     public void createAndShowGui(WordlPuzzle puzzle, JFrame jFrame) throws IOException {
         ControlService controlService=new ControlService();
         //label'ların olduğu dizi
-        Point labelsStartPoint=new Point(10,10);
+        Point labelsStartPoint=new Point(200,10);
         JLabel [] myArray =controlService.createLabelsForMouse(jFrame,controlService,labelsStartPoint);
 
         jFrame.setTitle("Wordle Game");
         jFrame.setSize(800,800);
         jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
+        Point buttonsStartPoint=new Point(80,350);
         JButton[] buttons=new JButton[31];
-        buttons=ControlService.createButtonsForMouse(myArray,buttons,jFrame,controlService,puzzle,user);
+        buttons=ControlService.createButtonsForMouse(myArray,buttonsStartPoint,buttons,jFrame,controlService,puzzle,user,null);
+        user.getIsActive().set(true);
+        ControlService.createUserInformations(jFrame,controlService,user,null);
         jFrame.setLayout(null);
     }
 
