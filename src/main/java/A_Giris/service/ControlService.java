@@ -36,8 +36,8 @@ public class ControlService {
     }
     private static int [] keyboard=  {69,82,84,89,85,73,79,80,286,220,65,83,68,70,71,72,74,75,76,350,304,10,90,67,86,66,78,77,214,199,8};
     private static int [] lowerKeyboard= {101,114,116,121,117,305,111,112,287,252,97,115,100,102,103,104,106,107,108,351,105,10,122,120,99,118,98,110,109,246,231,8};
-    private static boolean flag=true;
     private Timer timer=new Timer();
+    private static AtomicBoolean isSwitch=new AtomicBoolean(false);
 
     public void setRoundCounter(AtomicInteger roundCounter) {
         this.roundCounter = roundCounter;
@@ -109,30 +109,31 @@ public class ControlService {
         return finishedRound;
     }
 
+
     public void setFinishedRound(AtomicBoolean finishedRound) {
         this.finishedRound = finishedRound;
     }
-
+    //TODO USER INFORMATION VE THREAD
     public static void createUserInformations(JFrame jFrame, ControlService controlService,User user1,User user2){
         //TODO bunların x'i farklı olacak
         JLabel user1Label=new JLabel("Oyuncu-1 : ");
-        user1Label.setBounds(10,510,50,20);
+        user1Label.setBounds(10,510,100,20);
         JLabel user1Details=new JLabel(user1.getUserName());
-        user1Details.setBounds(60,510,50,20);
+        user1Details.setBounds(100,510,50,20);
         JLabel user1Time=new JLabel("");
         user1Time.setBounds(10,530,50,20);
         JLabel user1Active = new JLabel("");
-        user1Active.setBounds(60,530,50,50);
+        user1Active.setBounds(100,530,50,50);
         user1Active.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
         //TODO ikinci oyuncunun gelmediği durum ayarlanacak
             JLabel user2Label=new JLabel("Oyuncu-2 : ");
-            user2Label.setBounds(150,510,100,20);
+            user2Label.setBounds(200,510,100,20);
             JLabel user2Details=new JLabel(" ");
-            user2Details.setBounds(250,510,250,20);
+            user2Details.setBounds(300,510,250,20);
             JLabel user2Time=new JLabel("");
-            user2Time.setBounds(150,530,100,20);
+            user2Time.setBounds(200,530,100,20);
             JLabel user2Active = new JLabel("");
-            user2Active.setBounds(250,530,50,50);
+            user2Active.setBounds(300,530,50,50);
             user2Active.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
 
 
@@ -143,18 +144,28 @@ public class ControlService {
                     if(user1.getIsActive().get()){
                         user1Time.setText(String.valueOf(controlService.timer.getTime()));
                         user1Active.setBorder(BorderFactory.createLineBorder(Color.GREEN));
+                        user1Active.setBackground(Color.GREEN);
+                        user1Active.setForeground(Color.GREEN);
+                        user1Active.setOpaque(true);
+                        user2Active.setOpaque(true);
+                        user2Active.setForeground(Color.DARK_GRAY);
+                        user2Active.setBackground(Color.DARK_GRAY);
                         user2Active.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
                     }else if(user2!=null && user2.getIsActive().get()){
                         user2Time.setText(String.valueOf(controlService.timer.getTime()));
                         user2Active.setBorder(BorderFactory.createLineBorder(Color.GREEN));
+                        user2Active.setBackground(Color.GREEN);
+                        user2Active.setForeground(Color.GREEN);
+                        user2Active.setOpaque(true);
+                        user1Active.setOpaque(true);
+                        user1Active.setForeground(Color.DARK_GRAY);
+                        user1Active.setBackground(Color.DARK_GRAY);
                         user1Active.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
                     }
                 }
             }
         });
-
         t1.start();
-
 
         jFrame.add(user1Label);
         jFrame.add(user1Details);
@@ -167,160 +178,9 @@ public class ControlService {
             jFrame.add(user2Time);
             jFrame.add(user2Active);
         }
-
     }
-
-
-
-    public static JButton[] createButtonsForMouse(JLabel[] myArray,JButton[] buttons, JFrame jFrame, ControlService controlService, WordlPuzzle puzzle,User user){
-        int x=10;
-        int y=10;
-        for(int i=0;i<31;i++){
-            if(i<=9){
-                buttons[i] = new JButton(String.valueOf((char) keyboard[i]));
-                buttons[i].setBounds(x + i*50,y,50,30);
-                buttons[i].setLocale(Locale.getDefault());
-                JButton temp=buttons[i];
-                buttons[i].setTransferHandler(new ValueExportTransferHandler(temp.getText()));
-                buttons[i].addMouseMotionListener(new MouseAdapter() {
-                    @Override
-                    public void mouseDragged(MouseEvent e) {
-                        JButton temp= (JButton) e.getSource();
-                        TransferHandler handle = temp.getTransferHandler();
-                        handle.exportAsDrag(temp,e,TransferHandler.COPY);
-                    }
-                });
-                jFrame.add(buttons[i]);
-            }else{
-                y=50;
-                if(i<=20){
-                    buttons[i] =new JButton(String.valueOf((char) keyboard[i]));
-                    buttons[i].setBounds(x + (i-10)*50 ,y,50,30);
-                    JButton temp=buttons[i];
-                    //TODO buraya button sürükleme gelecek
-                    buttons[i].setTransferHandler(new ValueExportTransferHandler(temp.getText()));
-                    buttons[i].addMouseMotionListener(new MouseAdapter() {
-                        @Override
-                        public void mouseDragged(MouseEvent e) {
-                            JButton temp= (JButton) e.getSource();
-                            TransferHandler handle = temp.getTransferHandler();
-                            handle.exportAsDrag(temp,e,TransferHandler.COPY);
-                        }
-                    });
-                    jFrame.add( buttons[i]);
-
-                }else{
-                    y=100;
-                    if(!(keyboard[i]==10) && !(keyboard[i]==8)){
-                        buttons[i] =new JButton(String.valueOf((char) keyboard[i]));
-                        buttons[i].setBounds(x+ (i-21)*50,y,50,30);
-                        JButton temp=buttons[i];
-                        //TODO buraya button sürükleme gelecek
-                        buttons[i].setTransferHandler(new ValueExportTransferHandler(temp.getText()));
-                        buttons[i].addMouseMotionListener(new MouseAdapter() {
-                            @Override
-                            public void mouseDragged(MouseEvent e) {
-                                JButton temp= (JButton) e.getSource();
-                                TransferHandler handle = temp.getTransferHandler();
-                                handle.exportAsDrag(temp,e,TransferHandler.COPY);
-                            }
-                        });
-                        jFrame.add( buttons[i]);
-                    }else if(keyboard[i]==10){
-                        //TODO ENTER Tuşu
-                        buttons[i] = new JButton();
-                        Image buttonIcon = null;
-                        try {
-                            buttonIcon = ImageIO.read(new File("enter.png"));
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        buttons[i] = new JButton(new ImageIcon(buttonIcon));
-                        buttons[i].setBorderPainted(true);
-                        buttons[i].setFocusPainted(true);
-                        buttons[i].setContentAreaFilled(false);
-                        buttons[i].setBounds(x,y,50,30);
-                        //TODO enter çalıştırılacak
-                        buttons[i].addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                if(controlService.getCount().get()==5 && !controlService.getFinishedRound().get()){
-                                    //TODO Girilen her kelime sonrası kelimenin kontrol edilmesi
-                                    controlService.getRoundCounter().incrementAndGet();
-                                    controlService.getCount().set(0);
-                                    puzzle.addWord(controlService.getBuilder().toString());
-                                    controlService.removeTempLabels();
-                                    if(puzzle.checkWord()){
-                                        puzzle.calculateScore(puzzle.getMatches(),puzzle.getNotMatchesWords());
-                                        controlService.getFinishedRound().set(true);
-
-                                        for(JLabel elem: controlService.getWrittenLabels()){
-                                            elem.setBorder(BorderFactory.createLineBorder(Color.GREEN));
-                                        }
-                                        congratulations(user);
-                                        FileService.writeScore(user);
-                                    }else{
-                                        for(int i=0;i<puzzle.getMatches().length;i++){
-                                            if(puzzle.getMatches()[i]==true){
-                                                controlService.getWrittenLabels().get(i).setBorder(BorderFactory.createLineBorder(Color.GREEN));
-                                            }else{
-                                                if(puzzle.getNotMatchesWords()[i]==true){
-                                                    controlService.getWrittenLabels().get(i).setBorder(BorderFactory.createLineBorder(Color.YELLOW));
-                                                }
-                                            }
-                                        }
-                                        puzzle.calculateScore(puzzle.getMatches(),puzzle.getNotMatchesWords());
-                                        System.out.println("skor : "+user.getScore());
-                                    }
-                                    controlService.getBuilder().delete(0,5);
-                                    controlService.getWrittenLabels().clear();
-                                    if (controlService.getRoundCounter().get() == 5) {
-                                        puzzle.calculateScore(puzzle.getMatches(),puzzle.getNotMatchesWords());
-                                        looseMessage(user);
-                                        controlService.getFinishedRound().set(true);
-                                    }
-                                }
-                            }
-                        });
-                        jFrame.add(buttons[i]);
-                    }else if(keyboard[i]==8){
-                        //TODO BACKSPACE tuşu
-                        buttons[i] =new JButton("<-");
-                        buttons[i].setBounds(x + (i-21)*50,y,50,30);
-
-                        buttons[i].addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                try{
-                                    JLabel lastModified;
-                                    if(controlService.getLabelCounter()>0 && (lastModified = controlService.getLastJLabel())!=null && controlService.getWrittenLabels().size()>0)
-                                    {
-                                        lastModified.setText(" ");
-                                        controlService.getCount().decrementAndGet();
-                                        if(controlService.getBuilder().length()>0){
-                                            controlService.getBuilder().deleteCharAt(controlService.getBuilder().length()-1);
-                                        }
-                                        controlService.getWrittenLabels().remove( controlService.getWrittenLabels().size()-1);
-                                    }
-                                }catch (NullPointerException ex){
-                                }
-                            }
-                        });
-                        jFrame.add(buttons[i]);
-                    }
-                }
-            }
-        }
-        return buttons;
-    }
-
-    public static JButton[] createButtonsForKeyBoard(JLabel[] myArray,Point buttonsStartPoint, JButton[] buttons, JFrame jFrame, ControlService controlService, WordlPuzzle puzzle,User user1,User user2){
-        int x=buttonsStartPoint.x;
-        int y=buttonsStartPoint.y;
-        //TODO BURASI saniyeleri sayan ve aktif kullanıcının değiştiği bölüm
-        //TODO Bunun yanında aktif olan kullanıcıyı check yapan ve yeşil yanmasını sağlayan thread yaratılmalı
-       //Timer timer=controlService.timer;
-        AtomicBoolean isSwitch=new AtomicBoolean(false);
+    //TODO TIMER THREAD
+    public static void createTimerThread(User user1,User user2,ControlService controlService){
         //TODO RoundCount ve eğer hiç birşey girilmediyse bütün labelları kırmızı yap
         Thread t1=new Thread(new Runnable() {
             void switchActiveUser(){
@@ -363,8 +223,6 @@ public class ControlService {
                         if(user2!=null){
                             switchActiveUser();
                         }
-                        //kaç round çalıştığı bilinmeli
-                        //controlService.getCount().incrementAndGet();
                         isSwitch.set(false);
                         controlService.timer.reset();
                         Thread.sleep(1000);
@@ -375,6 +233,12 @@ public class ControlService {
             }
         });
         t1.start();
+    }
+
+    public static JButton[] createButtonsForMouse(JLabel[] myArray,Point buttonsStartPoint,JButton[] buttons, JFrame jFrame, ControlService controlService, WordlPuzzle puzzle,User user1,User user2){
+        int x=buttonsStartPoint.x;
+        int y=buttonsStartPoint.y;
+        createTimerThread(user1,user2,controlService);
 
         for(int i=0;i<31;i++){
             if(i<=9){
@@ -382,11 +246,174 @@ public class ControlService {
                 buttons[i].setBounds(x + i*50,y,50,30);
                 buttons[i].setLocale(Locale.getDefault());
                 JButton temp=buttons[i];
+                buttons[i].setTransferHandler(new ValueExportTransferHandler(temp.getText()));
+                buttons[i].addMouseMotionListener(new MouseAdapter() {
+                    @Override
+                    public void mouseDragged(MouseEvent e) {
+                        JButton temp= (JButton) e.getSource();
+                        TransferHandler handle = temp.getTransferHandler();
+                        handle.exportAsDrag(temp,e,TransferHandler.COPY);
+                    }
+                });
+                jFrame.add(buttons[i]);
+            }else{
+                if(i<=20){
+                    buttons[i] =new JButton(String.valueOf((char) keyboard[i]));
+                    buttons[i].setBounds(x + (i-10)*50 ,y+50,50,30);
+                    JButton temp=buttons[i];
+                    //TODO buraya button sürükleme gelecek
+                    buttons[i].setTransferHandler(new ValueExportTransferHandler(temp.getText()));
+                    buttons[i].addMouseMotionListener(new MouseAdapter() {
+                        @Override
+                        public void mouseDragged(MouseEvent e) {
+                            JButton temp= (JButton) e.getSource();
+                            TransferHandler handle = temp.getTransferHandler();
+                            handle.exportAsDrag(temp,e,TransferHandler.COPY);
+                        }
+                    });
+                    jFrame.add( buttons[i]);
+                }else{
+                    if(!(keyboard[i]==10) && !(keyboard[i]==8)){
+                        buttons[i] =new JButton(String.valueOf((char) keyboard[i]));
+                        buttons[i].setBounds(x+ (i-21)*50,y+100,50,30);
+                        JButton temp=buttons[i];
+                        //TODO buraya button sürükleme gelecek
+                        buttons[i].setTransferHandler(new ValueExportTransferHandler(temp.getText()));
+                        buttons[i].addMouseMotionListener(new MouseAdapter() {
+                            @Override
+                            public void mouseDragged(MouseEvent e) {
+                                JButton temp= (JButton) e.getSource();
+                                TransferHandler handle = temp.getTransferHandler();
+                                handle.exportAsDrag(temp,e,TransferHandler.COPY);
+                            }
+                        });
+                        jFrame.add( buttons[i]);
+                    }else if(keyboard[i]==10){
+                        //TODO ENTER Tuşu
+                        buttons[i] = new JButton();
+                        Image buttonIcon = null;
+                        try {
+                            buttonIcon = ImageIO.read(new File("enter.png"));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        buttons[i] = new JButton(new ImageIcon(buttonIcon));
+                        buttons[i].setBorderPainted(true);
+                        buttons[i].setFocusPainted(true);
+                        buttons[i].setContentAreaFilled(false);
+                        buttons[i].setBounds(x,y+100,50,30);
+                        //TODO enter çalıştırılacak
+                        buttons[i].addActionListener(new ActionListener() {
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                if(controlService.getCount().get()==5 && !controlService.getFinishedRound().get()){
+                                    //TODO Girilen her kelime sonrası kelimenin kontrol edilmesi
+                                    controlService.getRoundCounter().incrementAndGet();
+                                    controlService.getCount().set(0);
+                                    puzzle.addWord(controlService.getBuilder().toString());
+                                    controlService.removeTempLabels();
+                                    if(puzzle.checkWord()){
+                                        puzzle.calculateScore(puzzle.getMatches(),puzzle.getNotMatchesWords());
+                                        controlService.getFinishedRound().set(true);
 
+                                        for(JLabel elem: controlService.getWrittenLabels()){
+                                            elem.setBorder(BorderFactory.createLineBorder(Color.GREEN));
+                                        }
+                                        //Eğer doğru bilinmiş ise tebrik ediyor ve skoru dosyaya yazıyor
+                                        if(user2==null){
+                                            congratulations(user1);
+                                            FileService.writeScore(user1);
+                                        }else{
+                                            if(user1.getIsActive().get()){
+                                                congratulations(user1);
+                                                FileService.writeScore(user1);
+                                            }else{
+                                                congratulations(user2);
+                                                FileService.writeScore(user2);
+                                            }
+                                        }
+                                    }else{
+                                        for(int i=0;i<puzzle.getMatches().length;i++){
+                                            if(puzzle.getMatches()[i]==true){
+                                                controlService.getWrittenLabels().get(i).setBorder(BorderFactory.createLineBorder(Color.GREEN));
+                                            }else{
+                                                if(puzzle.getNotMatchesWords()[i]==true){
+                                                    controlService.getWrittenLabels().get(i).setBorder(BorderFactory.createLineBorder(Color.YELLOW));
+                                                }
+                                            }
+                                        }
+                                        isSwitch.set(true);
+                                        puzzle.calculateScore(puzzle.getMatches(),puzzle.getNotMatchesWords());
+                                        System.out.println("skor : "+user1.getScore());
+                                    }
+                                    controlService.getBuilder().delete(0,5);
+                                    controlService.getWrittenLabels().clear();
+                                    if (controlService.getRoundCounter().get() == 5) {
+                                        puzzle.calculateScore(puzzle.getMatches(),puzzle.getNotMatchesWords());
+                                        looseMessage(user1);
+                                        controlService.getFinishedRound().set(true);
+                                        if(user2==null){
+                                            looseMessage(user1);
+                                            controlService.getFinishedRound().set(true);
+                                        }else{
+                                            if(user1.getIsActive().get()){
+                                                looseMessage(user1);
+                                                controlService.getFinishedRound().set(true);
+                                            }else{
+                                                //TODO 2. oyuncunun skorunu düzelt
+                                                looseMessage(user2);
+                                                controlService.getFinishedRound().set(true);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                        jFrame.add(buttons[i]);
+                    }else if(keyboard[i]==8){
+                        //TODO BACKSPACE tuşu
+                        buttons[i] =new JButton("<-");
+                        buttons[i].setBounds(x + (i-21)*50,y+100,50,30);
+                        buttons[i].addActionListener(new ActionListener() {
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                try{
+                                    JLabel lastModified;
+                                    if(controlService.getLabelCounter()>0 && (lastModified = controlService.getLastJLabel())!=null && controlService.getWrittenLabels().size()>0)
+                                    {
+                                        lastModified.setText(" ");
+                                        controlService.getCount().decrementAndGet();
+                                        if(controlService.getBuilder().length()>0){
+                                            controlService.getBuilder().deleteCharAt(controlService.getBuilder().length()-1);
+                                        }
+                                        controlService.getWrittenLabels().remove( controlService.getWrittenLabels().size()-1);
+                                    }
+                                }catch (NullPointerException ex){
+                                }
+                            }
+                        });
+                        jFrame.add(buttons[i]);
+                    }
+                }
+            }
+        }
+        return buttons;
+    }
+
+    public static JButton[] createButtonsForKeyBoard(JLabel[] myArray,Point buttonsStartPoint, JButton[] buttons, JFrame jFrame, ControlService controlService, WordlPuzzle puzzle,User user1,User user2){
+        int x=buttonsStartPoint.x;
+        int y=buttonsStartPoint.y;
+        //TODO TIMER THREAD'IN YARATILMASI
+        createTimerThread(user1,user2,controlService);
+
+        for(int i=0;i<31;i++){
+            if(i<=9){
+                buttons[i] = new JButton(String.valueOf((char) keyboard[i]));
+                buttons[i].setBounds(x + i*50,y,50,30);
+                buttons[i].setLocale(Locale.getDefault());
+                JButton temp=buttons[i];
                 //Klavye tuşlarını dinleyen KeyListener
                 buttons[i].addKeyListener(new KeyListener() {
-
-
                     @Override
                     public void keyTyped(KeyEvent e) {
                     }
@@ -498,7 +525,7 @@ public class ControlService {
                         buttons[i].setBounds(x+ (i-21)*50,y+100,50,30);
                         jFrame.add( buttons[i]);
                     }else if(keyboard[i]==10){
-                        buttons[i] = new JButton("EN");
+                        buttons[i] = new JButton("");
                         Image buttonIcon = null;
                         try {
                             buttonIcon = ImageIO.read(new File("enter.png"));
@@ -608,14 +635,11 @@ public class ControlService {
     }
 
     public static class ValueExportTransferHandler extends TransferHandler {
-
         public static final DataFlavor SUPPORTED_DATE_FLAVOR = DataFlavor.stringFlavor;
         private String value;
-
         public ValueExportTransferHandler(String value) {
             this.value = value;
         }
-
         public String getValue() {
             return value;
         }
@@ -624,19 +648,16 @@ public class ControlService {
         public int getSourceActions(JComponent c) {
             return DnDConstants.ACTION_COPY_OR_MOVE;
         }
-
         @Override
         protected Transferable createTransferable(JComponent c) {
             Transferable t = new StringSelection(getValue());
             return t;
         }
-
         @Override
         protected void exportDone(JComponent source, Transferable data, int action) {
             super.exportDone(source, data, action);
             // Decide what to do after the drop has been accepted
         }
-
     }
 
     private static void looseMessage(User user) {
