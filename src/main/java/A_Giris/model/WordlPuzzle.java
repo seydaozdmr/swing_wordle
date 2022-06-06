@@ -40,23 +40,19 @@ public class WordlPuzzle {
         matches = new boolean[5];
         notMatchesWords = new boolean[5];
         notFoundChars.clear();
-
         boolean result = true;
         char[] chosen = chosenWord.toCharArray();
         for (int i = 0; i < 5; i++) {
             if (word[i] == chosen[i]) {
                 matches[i] = true;
             } else {
-
                 notFoundChars.merge(chosen[i], 1, Integer::sum);
                 result = false;
             }
         }
-
         for (int i = 0; i < 5; i++) {
             if (!matches[i]) {
                 for (int j = 0; j < 5; j++) {
-
                     if (chosen[i] == word[j] && notFoundChars.get(word[j]) >= 0) {
                         //Eğer chosen kelime içinde iki tane harf var ve tahminde de iki tane harf var fakat
                         //farklı bir yerdeyse ve ve notMatches(sarı) arıyorsak ve ilkini bulduktan sonra diğerini bulmak için döngüyü
