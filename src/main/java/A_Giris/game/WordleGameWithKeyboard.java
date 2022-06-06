@@ -29,30 +29,53 @@ public class WordleGameWithKeyboard extends JFrame implements SingleWordleGame{
     private static int [] lowerKeyboard= {101,114,116,121,117,305,111,112,287,252,97,115,100,102,103,104,106,107,108,351,105,10,122,120,99,118,98,110,109,246,231,8};
     //TODO ya fareden basarak ya da klavyeden basarak çalışmalı
     private static User user;
-
     public static void main(String[] args) {
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
                 WordleGameWithKeyboard wordleGameWithKeyboard =new WordleGameWithKeyboard(user);
                 wordleGameWithKeyboard.setVisible(true);
+
             }
         });
 
     }
     //TODO Sending data to client
-    public void sendingDataToClient(JLabel[] myArray){
-        byte [] message= Arrays.stream(myArray).map(e->e.getText().getBytes(StandardCharsets.UTF_8)[0]).collect(toByteArray());
-        ServerSocket serverSocket = null;
-        try {
-            serverSocket = new ServerSocket(1234);
-            Socket socket = serverSocket.accept();
-            DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
-            dOut.writeInt(myArray.length);
-            dOut.write(message);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//    public void sendingDataToClient(JLabel[] myArray){
+//
+//        ServerSocket serverSocket = null;
+//        try {
+//            serverSocket = new ServerSocket(1234);
+//            Socket socket = serverSocket.accept();
+//            createSocketThread(socket,myArray);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
+
+    public void createSocketThread(Socket socket, JLabel [] myArray){
+        Thread t1=new Thread(new Runnable() {
+            //byte [] message= Arrays.stream(myArray).map(e->e.getText().getBytes(StandardCharsets.UTF_8)[0]).collect(toByteArray());
+            @Override
+            public void run() {
+
+                try( DataOutputStream dOut = new DataOutputStream(socket.getOutputStream()) ) {
+                        byte [] message= Arrays.stream(myArray).map(e->e.getText().getBytes(StandardCharsets.UTF_8)[0]).collect(toByteArray());
+                        try {
+                            dOut.writeInt(myArray.length);
+                            dOut.write(message);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+
+            }
+        });
+        t1.start();
     }
 
 
@@ -88,7 +111,7 @@ public class WordleGameWithKeyboard extends JFrame implements SingleWordleGame{
         Point labelsStartPoint=new Point(200,10);
         JLabel [] myArray = controlService.createLabelsForKeyBoard(jFrame,labelsStartPoint);
 
-        sendingDataToClient(myArray);
+        //sendingDataToClient(myArray);
         //jFrame ayarları
         jFrame.setTitle("Wordle Game");
         jFrame.setSize(800 ,800);
@@ -100,6 +123,7 @@ public class WordleGameWithKeyboard extends JFrame implements SingleWordleGame{
         buttons= ControlService.createButtonsForKeyBoard(myArray,buttonsStartPoint,buttons,jFrame,controlService,puzzle,user,null);
         user.getIsActive().set(true);
         ControlService.createUserInformations(jFrame,controlService,user,null);
+        controlService.createSocketServer(myArray);
         jFrame.setLayout(null);
         //jFrame.setVisible(true);
     }
