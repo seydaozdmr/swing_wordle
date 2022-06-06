@@ -13,14 +13,17 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.dnd.DnDConstants;
 import java.awt.event.*;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Collector;
 
 public class ControlService {
     private JButton tempButton;
@@ -38,6 +41,8 @@ public class ControlService {
     private static int [] lowerKeyboard= {101,114,116,121,117,305,111,112,287,252,97,115,100,102,103,104,106,107,108,351,105,10,122,120,99,118,98,110,109,246,231,8};
     private Timer timer=new Timer();
     private static AtomicBoolean isSwitch=new AtomicBoolean(false);
+    private static ServerSocket serverSocket;
+    private static Socket socket;
 
     public void setRoundCounter(AtomicInteger roundCounter) {
         this.roundCounter = roundCounter;
@@ -107,6 +112,35 @@ public class ControlService {
 
     public AtomicBoolean getFinishedRound() {
         return finishedRound;
+    }
+
+    public void createSocketServer(JLabel [] myArray){
+        try {
+            serverSocket = new ServerSocket(1234);
+            socket = serverSocket.accept();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Thread t1=new Thread(new Runnable() {
+            @Override
+            public void run() {
+                DataOutputStream dOut =null;
+                try {
+                     dOut = new DataOutputStream(socket.getOutputStream());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                sendData(myArray,dOut);
+
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        t1.start();
     }
 
 
@@ -437,6 +471,7 @@ public class ControlService {
                                     tempLabel.setText(String.valueOf((char) Arrays.stream(lowerKeyboard)
                                             .filter(a -> e.getKeyChar() == a).findFirst().getAsInt()).toUpperCase(Locale.getDefault()));
                                     controlService.addJLabel(tempLabel);
+                                    //sending data to client
                                     controlService.setTempButton(temp);
                                     //TODO son eklenenlerin de silinmesi lazım
                                     controlService.getBuilder().append(tempLabel.getText());
@@ -451,6 +486,8 @@ public class ControlService {
                                 controlService.getCount().set(0);
                                 puzzle.addWord(controlService.getBuilder().toString());
                                 controlService.removeTempLabels();
+                                //TODO sending data to client
+                                //controlService.sendData(myArray);
                                 if(puzzle.checkWord()){
                                     puzzle.calculateScore(puzzle.getMatches(),puzzle.getNotMatchesWords());
                                     controlService.getFinishedRound().set(true);
@@ -549,6 +586,43 @@ public class ControlService {
         }
         return buttons;
 
+    }
+
+    private void sendData(JLabel [] myArray,DataOutputStream dOut) {
+            while(true){
+                byte [] message= Arrays.stream(myArray).map(e->e.getText().getBytes(StandardCharsets.UTF_8)[0]).collect(toByteArray());
+                try {
+                    dOut.writeInt(myArray.length);
+                    dOut.write(message);
+//                    for(int i=0;i<message.length;i++){
+//                        System.out.println(String.valueOf(message[i]));
+//                    }
+//                    System.out.println("mesajın uzunluğu : "+message.length);
+                    dOut.flush();
+                    try {
+                        Thread.sleep(5000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+
+    }
+
+
+    public static Collector<Byte, ?, byte[]> toByteArray() {
+        return Collector.of(ByteArrayOutputStream::new, ByteArrayOutputStream::write, (baos1, baos2) -> {
+            try {
+                baos2.writeTo(baos1);
+                return baos1;
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
+        }, ByteArrayOutputStream::toByteArray);
     }
 
     public static JLabel[] createLabelsForKeyBoard (JFrame jFrame,Point startPoint){
