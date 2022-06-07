@@ -42,53 +42,7 @@ public class WordleGameWithKeyboard extends JFrame implements SingleWordleGame{
         });
 
     }
-    //TODO Sending data to client
-//    public void sendingDataToClient(JLabel[] myArray){
-//
-//        ServerSocket serverSocket = null;
-//        try {
-//            serverSocket = new ServerSocket(1234);
-//            Socket socket = serverSocket.accept();
-//            createSocketThread(socket,myArray);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//    }
-
-//    public void createSocketThread(Socket socket, JLabel [] myArray){
-//        Thread t1=new Thread(new Runnable() {
-//            //byte [] message= Arrays.stream(myArray).map(e->e.getText().getBytes(StandardCharsets.UTF_8)[0]).collect(toByteArray());
-//            @Override
-//            public void run() {
-//                try( DataOutputStream dOut = new DataOutputStream(socket.getOutputStream()) ) {
-//                        byte [] message= Arrays.stream(myArray).map(e->e.getText().getBytes(StandardCharsets.UTF_8)[0]).collect(toByteArray());
-//                        try {
-//                            dOut.writeInt(myArray.length);
-//                            dOut.write(message);
-//                        } catch (IOException e) {
-//                            e.printStackTrace();
-//                        }
-//
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        });
-//        t1.start();
-//    }
-
-    public static Collector<Byte, ?, byte[]> toByteArray() {
-        return Collector.of(ByteArrayOutputStream::new, ByteArrayOutputStream::write, (baos1, baos2) -> {
-            try {
-                baos2.writeTo(baos1);
-                return baos1;
-            } catch (IOException e) {
-                throw new UncheckedIOException(e);
-            }
-        }, ByteArrayOutputStream::toByteArray);
-    }
-
-
+    //TODO Constructor
     public WordleGameWithKeyboard(User user , boolean hasVisitor){
         this.user=user;
         this.hasVisitor= hasVisitor;
@@ -98,8 +52,6 @@ public class WordleGameWithKeyboard extends JFrame implements SingleWordleGame{
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
     }
 
     @Override
