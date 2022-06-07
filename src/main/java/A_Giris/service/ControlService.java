@@ -483,8 +483,6 @@ public class ControlService {
                                 controlService.getCount().set(0);
                                 puzzle.addWord(controlService.getBuilder().toString());
                                 controlService.removeTempLabels();
-                                //TODO sending data to client
-                                //controlService.sendData(myArray);
                                 if(puzzle.checkWord()){
                                     puzzle.calculateScore(puzzle.getMatches(),puzzle.getNotMatchesWords());
 
@@ -494,16 +492,20 @@ public class ControlService {
                                     }
                                     //TODO Eğer aktif olan User1 ise User2 değilse user2
                                     if(user2==null){
-                                        congratulations(user1);
-                                        FileService.writeScore(user1);
                                         user1.setWin(true);
                                         FileService.writeStatistic(user1);
+                                        congratulations(user1);
+                                        FileService.writeScore(user1);
                                     }else{
                                         if(user1.getIsActive().get()){
+                                            user1.setWin(true);
+                                            FileService.writeStatistic(user1);
                                             congratulations(user1);
                                             FileService.writeScore(user1);
-                                            FileService.writeStatistic(user1);
+
                                         }else{
+                                            user2.setWin(true);
+                                            FileService.writeStatistic(user2);
                                             congratulations(user2);
                                             FileService.writeScore(user2);
                                             FileService.writeStatistic(user1);
@@ -529,22 +531,23 @@ public class ControlService {
                                 if (controlService.getRoundCounter().get() == 5) {
                                     puzzle.calculateScore(puzzle.getMatches(),puzzle.getNotMatchesWords());
                                     if(user2==null){
-                                        looseMessage(user1);
-                                        controlService.getFinishedRound().set(true);
                                         user1.setWin(false);
                                         FileService.writeStatistic(user1);
+                                        looseMessage(user1);
+                                        controlService.getFinishedRound().set(true);
                                     }else{
                                         if(user1.getIsActive().get()){
-                                            looseMessage(user1);
-                                            controlService.getFinishedRound().set(true);
                                             user1.setWin(false);
                                             FileService.writeStatistic(user1);
+                                            looseMessage(user1);
+                                            controlService.getFinishedRound().set(true);
                                         }else{
                                             //TODO 2. oyuncunun skorunu düzelt
-                                            looseMessage(user2);
-                                            controlService.getFinishedRound().set(true);
                                             user2.setWin(false);
                                             FileService.writeStatistic(user2);
+                                            looseMessage(user2);
+                                            controlService.getFinishedRound().set(true);
+
                                         }
                                     }
                                 }
@@ -750,18 +753,50 @@ public class ControlService {
     private static void looseMessage(User user) {
         //BURALAR DOSYADAN OKUNACAK...
         StringBuilder builder=new StringBuilder();
+        Optional<User> temp= FileService.findUserFromStatisticFile(user);
+        if(temp.isPresent()){
+            User tempUser=temp.get();
+            user.setPlayedCount(tempUser.getPlayedCount());
+            user.setWined(tempUser.getWined());
+            user.setLoosed(tempUser.getLoosed());
+        }else{
+            user.setPlayedCount(1);
+            if(user.isWin())
+                user.setWined(1);
+            else
+                user.setLoosed(1);
+        }
         builder.append("Üzgünüz \n");
         builder.append("Kullanıcı: "+user.getUserName()+" \n");
         builder.append("Skor: "+user.getScore()+" \n");
+        builder.append("Oynanan Oyun Sayısı: "+user.getPlayedCount()+" \n");
+        builder.append("Kazanılan: "+user.getWined()+" \n");
+        builder.append("Kaybedilen :"+ user.getLoosed()+" \n");
         builder.append("Sonuç: Oyunu Kaybettiniz \n");
         GameService.showLooseMessage(builder.toString());
     }
 
     private static void congratulations(User user) {
         StringBuilder builder=new StringBuilder();
+        Optional<User> temp= FileService.findUserFromStatisticFile(user);
+        if(temp.isPresent()){
+            User tempUser=temp.get();
+            user.setPlayedCount(tempUser.getPlayedCount());
+            user.setWined(tempUser.getWined());
+            user.setLoosed(tempUser.getLoosed());
+        }else{
+            user.setPlayedCount(1);
+            if(user.isWin())
+                user.setWined(1);
+            else
+                user.setLoosed(1);
+        }
         builder.append("Tebrikler \n");
         builder.append("Kullanıcı: "+user.getUserName()+" \n");
         builder.append("Skor: "+user.getScore()+" \n");
+        builder.append("Oynanan Oyun Sayısı: "+user.getPlayedCount()+" \n");
+        builder.append("Kazanılan: "+user.getWined()+" \n");
+        builder.append("Kaybedilen :"+ user.getLoosed()+" \n");
         builder.append("Sonuç: oyunu kazandınız \n");
         GameService.showCongratulations(builder.toString());
     }

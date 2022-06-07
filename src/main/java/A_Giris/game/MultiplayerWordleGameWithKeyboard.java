@@ -7,10 +7,9 @@ import A_Giris.service.ControlService;
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
-import java.util.Arrays;
+
 import java.util.Random;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.ReentrantLock;
+
 
 public class MultiplayerWordleGameWithKeyboard extends JFrame implements MultiPlayerGame {
     private static User user1;
