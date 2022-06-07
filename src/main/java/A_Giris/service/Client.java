@@ -37,16 +37,12 @@ public class Client extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         Point labelsStartPoint=new Point(200,10);
         myArray = controlService.createLabelsForKeyBoard(this,labelsStartPoint);
-
         setLayout(null);
-        //getData();
+
     }
 
     private static void getData() {
         Thread t1=new Thread(new Runnable() {
-
-
-
             @Override
             public void run() {
                 DataInputStream dIn=null;
@@ -58,31 +54,16 @@ public class Client extends JFrame {
                     }
                 }
                 while (socket.isConnected()) {
-                    //int length = dIn.readInt();
-
                     try {
-//                        DataInputStream dIn=null;
-//                        {
-//                            try {
-//                                dIn = new DataInputStream(socket.getInputStream());
-//                            } catch (IOException e) {
-//                                e.printStackTrace();
-//                            }
-//                        }
                         byte[] message;
                         int length = dIn.readInt();
-//                            if (length == 0)
-//                                break;
-                        System.out.println("mesaj uzunluğu: " + length);// read length of incoming message
+                        System.out.println("mesaj uzunluğu: " + length);
                         message = new byte[length];
                         dIn.readFully(message);
-
                         for (int i = 0; i < message.length; i++) {
                             if(myArray[1]!=null && message[i]!=32){
                                 myArray[i].setText(String.valueOf((char)message[i]));
                             }
-
-                            //System.out.println(String.valueOf(message[i]));
                         }
                         try {
                             Thread.sleep(5000);
