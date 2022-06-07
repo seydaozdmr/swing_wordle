@@ -48,7 +48,7 @@ public class WordleGameWithMouse extends JFrame implements SingleWordleGame {
         buttons=ControlService.createButtonsForMouse(myArray,buttonsStartPoint,buttons,jFrame,controlService,puzzle,user,null);
         user.getIsActive().set(true);
         ControlService.createUserInformations(jFrame,controlService,user,null);
-
+        //TODO Eğer ziyaretçi varsa onun bağlanmasını bekliyor
         if(hasVisitor)
             controlService.createSocketServer(myArray);
         jFrame.setLayout(null);
