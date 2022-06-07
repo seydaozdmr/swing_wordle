@@ -15,20 +15,21 @@ import java.util.concurrent.locks.ReentrantLock;
 public class MultiplayerWordleGameWithKeyboard extends JFrame implements MultiPlayerGame {
     private static User user1;
     private static User user2;
-
+    private static boolean hasVisitor;
     public static void main(String[] args) {
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                MultiplayerWordleGameWithKeyboard multiplayerWordleGameWithKeyboard =new MultiplayerWordleGameWithKeyboard(user1,user2);
+                MultiplayerWordleGameWithKeyboard multiplayerWordleGameWithKeyboard =new MultiplayerWordleGameWithKeyboard(user1,user2,hasVisitor);
                 multiplayerWordleGameWithKeyboard.setVisible(true);
             }
         });
     }
 
-    public MultiplayerWordleGameWithKeyboard(User user1, User user2) {
+    public MultiplayerWordleGameWithKeyboard(User user1, User user2,boolean hasVisitor) {
         this.user1=user1;
         this.user2=user2;
+        this.hasVisitor=hasVisitor;
         try{
             WordlPuzzle puzzle=new WordlPuzzle(user1,user2);
             createAndShowGui(puzzle,this);
@@ -60,7 +61,8 @@ public class MultiplayerWordleGameWithKeyboard extends JFrame implements MultiPl
         buttons=ControlService.createButtonsForKeyBoard(labels,buttonsStartPoint,buttons,jFrame,controlService,puzzle,user1,user2);
         //TODO kullanıcılardan birini aktif olarak seçiyor ve 30 saniye süre veriyor süre bitince diğerine sıra geçiyor
         ControlService.createUserInformations(jFrame,controlService,user1,user2);
-
+        if(hasVisitor)
+            controlService.createSocketServer(labels);
         jFrame.setLayout(null);
     }
 

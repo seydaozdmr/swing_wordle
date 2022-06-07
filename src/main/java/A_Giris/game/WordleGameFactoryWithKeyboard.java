@@ -6,13 +6,13 @@ public class WordleGameFactoryWithKeyboard implements WordlGameFactory{
 
 
     @Override
-    public SingleWordleGame createSingleWordleGame(User user) {
-        return new WordleGameWithKeyboard(user);
+    public SingleWordleGame createSingleWordleGame(User user,boolean hasVisitor) {
+        return new WordleGameWithKeyboard(user,hasVisitor);
 
     }
 
     @Override
-    public MultiPlayerGame createMultiplayerWordleGame(User user1, User user2) {
-        return new MultiplayerWordleGameWithKeyboard(user1,user2);
+    public MultiPlayerGame createMultiplayerWordleGame(User user1, User user2 , boolean hasVisitor) {
+        return new MultiplayerWordleGameWithKeyboard(user1,user2,hasVisitor);
     }
 }

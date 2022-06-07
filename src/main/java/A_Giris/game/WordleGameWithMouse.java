@@ -9,22 +9,22 @@ import java.awt.*;
 import java.io.IOException;
 
 public class WordleGameWithMouse extends JFrame implements SingleWordleGame {
-
     private static User user;
+    private static boolean hasVisitor;
 
     public static void main(String[] args) {
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                WordleGameWithMouse wordleGameWithMouse=new WordleGameWithMouse(user);
+                WordleGameWithMouse wordleGameWithMouse=new WordleGameWithMouse(user,hasVisitor);
                 wordleGameWithMouse.setVisible(true);
             }
         });
     }
 
-    public WordleGameWithMouse(User user){
+    public WordleGameWithMouse(User user,boolean hasVisitor){
         this.user=user;
-
+        this.setHasVisitor(hasVisitor);
         try {
             WordlPuzzle puzzle=new WordlPuzzle(user);
             createAndShowGui(puzzle,this);
@@ -48,7 +48,17 @@ public class WordleGameWithMouse extends JFrame implements SingleWordleGame {
         buttons=ControlService.createButtonsForMouse(myArray,buttonsStartPoint,buttons,jFrame,controlService,puzzle,user,null);
         user.getIsActive().set(true);
         ControlService.createUserInformations(jFrame,controlService,user,null);
+
+        if(hasVisitor)
+            controlService.createSocketServer(myArray);
         jFrame.setLayout(null);
     }
 
+    public boolean isHasVisitor() {
+        return hasVisitor;
+    }
+
+    public void setHasVisitor(boolean hasVisitor) {
+        this.hasVisitor = hasVisitor;
+    }
 }
