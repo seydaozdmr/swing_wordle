@@ -35,11 +35,11 @@ public class MainPage extends JFrame{
         panel.setLayout(null);
 
         JTextField userName= new JFormattedTextField();
-        userName.setBounds(150,220,250,30);
+        userName.setBounds(150,230,250,30);
         panel.add(userName);
 
         JTextField userName2= new JFormattedTextField();
-        userName2.setBounds(150,290,250,30);
+        userName2.setBounds(150,300,250,30);
         userName2.setEditable(false);
         panel.add(userName2);
 
@@ -69,14 +69,18 @@ public class MainPage extends JFrame{
                 userName2.setEditable(true);
             }
         });
+
+        JCheckBox checkBox1 = new JCheckBox("Ziyaretçi");
+        checkBox1.setBounds(150,180, 150,20);
+        panel.add(checkBox1);
         ButtonGroup bg2= new ButtonGroup();
         bg2.add(rbSingle);
         bg2.add(rbMultiPlayer);
 
         JLabel o1=new JLabel("1- Oyuncu İsmi: ");
-        o1.setBounds(150,190,250,20);
+        o1.setBounds(150,200,250,20);
         JLabel o2=new JLabel("2- Oyuncu İsmi: ");
-        o2.setBounds(150,260,250,20);
+        o2.setBounds(150,270,250,20);
 
         panel.add(o1);
         panel.add(o2);
@@ -114,16 +118,16 @@ public class MainPage extends JFrame{
                         WordlGameFactory mauseFactory=new WordleGameFactoryWithMouse();
                         if(gameUser.getGameControls()==GameControls.KEYBOARD && bg2.getSelection().getActionCommand().charAt(0)=='s'){
                             gameUser.getIsActive().set(true);
-                            WordleGameWithKeyboard wordleGameWithKeyboard = (WordleGameWithKeyboard) factory.createSingleWordleGame(gameUser);
+                            WordleGameWithKeyboard wordleGameWithKeyboard = (WordleGameWithKeyboard) factory.createSingleWordleGame(gameUser,checkBox1.isSelected());
                             wordleGameWithKeyboard.setVisible(true);
                         }else if(gameUser.getGameControls()==GameControls.MOUSE && bg2.getSelection().getActionCommand().charAt(0)=='s'){
-                            WordleGameWithMouse wordleGameWithMouse=(WordleGameWithMouse) mauseFactory.createSingleWordleGame(gameUser);
+                            WordleGameWithMouse wordleGameWithMouse=(WordleGameWithMouse) mauseFactory.createSingleWordleGame(gameUser,checkBox1.isSelected());
                             wordleGameWithMouse.setVisible(true);
                         }else if(gameUser.getGameControls()==GameControls.KEYBOARD && bg2.getSelection().getActionCommand().charAt(0)=='m'){
-                            MultiplayerWordleGameWithKeyboard multiplayerWordleGameWithKeyboard=(MultiplayerWordleGameWithKeyboard) factory.createMultiplayerWordleGame(gameUser,gameUser2);
+                            MultiplayerWordleGameWithKeyboard multiplayerWordleGameWithKeyboard=(MultiplayerWordleGameWithKeyboard) factory.createMultiplayerWordleGame(gameUser,gameUser2,checkBox1.isSelected());
                             multiplayerWordleGameWithKeyboard.setVisible(true);
                         }else if(gameUser.getGameControls()==GameControls.MOUSE && bg2.getSelection().getActionCommand().charAt(0)=='m'){
-                            MultiPlayerWordleGameWithMouse multiPlayerWordleGameWithMouse=(MultiPlayerWordleGameWithMouse) mauseFactory.createMultiplayerWordleGame(gameUser,gameUser2);
+                            MultiPlayerWordleGameWithMouse multiPlayerWordleGameWithMouse=(MultiPlayerWordleGameWithMouse) mauseFactory.createMultiplayerWordleGame(gameUser,gameUser2,checkBox1.isSelected());
                             multiPlayerWordleGameWithMouse.setVisible(true);
                         }
                         dispose();
