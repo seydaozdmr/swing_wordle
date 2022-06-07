@@ -121,6 +121,7 @@ public class ControlService {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        //TODO bu thread sürekli visitor'a label'ların bilgisini gönderir...
         Thread t1=new Thread(new Runnable() {
             @Override
             public void run() {
@@ -130,9 +131,7 @@ public class ControlService {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-
                 sendData(myArray,dOut);
-
                 try {
                     Thread.sleep(2000);
                 } catch (InterruptedException e) {
@@ -144,9 +143,6 @@ public class ControlService {
     }
 
 
-    public void setFinishedRound(AtomicBoolean finishedRound) {
-        this.finishedRound = finishedRound;
-    }
     //TODO USER INFORMATION VE THREAD
     public static void createUserInformations(JFrame jFrame, ControlService controlService,User user1,User user2){
         //TODO bunların x'i farklı olacak
@@ -169,8 +165,6 @@ public class ControlService {
             JLabel user2Active = new JLabel("");
             user2Active.setBounds(300,530,50,50);
             user2Active.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
-
-
         Thread t1=new Thread(new Runnable() {
             @Override
             public void run() {
@@ -213,6 +207,7 @@ public class ControlService {
             jFrame.add(user2Active);
         }
     }
+
     //TODO TIMER THREAD
     public static void createTimerThread(User user1,User user2,ControlService controlService){
         //TODO RoundCount ve eğer hiç birşey girilmediyse bütün labelları kırmızı yap
@@ -435,6 +430,7 @@ public class ControlService {
     }
 
     public static JButton[] createButtonsForKeyBoard(JLabel[] myArray,Point buttonsStartPoint, JButton[] buttons, JFrame jFrame, ControlService controlService, WordlPuzzle puzzle,User user1,User user2){
+        //TODO burası klavye ile oynamak için gerekli buttonların ve zamanlayıcının çalıştırıldığı method
         int x=buttonsStartPoint.x;
         int y=buttonsStartPoint.y;
         //TODO TIMER THREAD'IN YARATILMASI
@@ -446,7 +442,7 @@ public class ControlService {
                 buttons[i].setBounds(x + i*50,y,50,30);
                 buttons[i].setLocale(Locale.getDefault());
                 JButton temp=buttons[i];
-                //Klavye tuşlarını dinleyen KeyListener
+                //TODO Klavye tuşlarını dinleyen KeyListener
                 buttons[i].addKeyListener(new KeyListener() {
                     @Override
                     public void keyTyped(KeyEvent e) {
@@ -454,8 +450,8 @@ public class ControlService {
                     @Override
                     public void keyPressed(KeyEvent e) {
                         //TODO oyun bittiğinde yeni bir event alma game is over...
-
                         if(!controlService.getFinishedRound().get()){
+                            //TODO silme tuşu
                             if(e.getKeyCode()==8 && controlService.getLabelCounter()!=0){
                                 JLabel lastModified= controlService.getLastJLabel();
                                 lastModified.setText(" ");
@@ -463,7 +459,7 @@ public class ControlService {
                                 controlService.getBuilder().deleteCharAt(controlService.getBuilder().length()-1);
                                 controlService.getWrittenLabels().remove(controlService.getWrittenLabels().size()-1);
                             }
-
+                            //TODO harf yazma işlemleri
                             if(!controlService.getFinishedRound().get() && controlService.getCount().get()<5 && e.getKeyCode()!=8 && e.getKeyCode()!=10) {
                                 controlService.getCount().incrementAndGet();
                                 try {
@@ -480,6 +476,7 @@ public class ControlService {
                                     System.out.println(e.getKeyCode() + " oyun için geçersiz");
                                 }
                             }
+                            //TODO enter tuşuna basıldığında
                             if(e.getKeyCode()==10 && controlService.getCount().get()==5 && !controlService.getFinishedRound().get()){
                                 //TODO Girilen her kelime sonrası kelimenin kontrol edilmesi
                                 controlService.getRoundCounter().incrementAndGet();
@@ -490,8 +487,8 @@ public class ControlService {
                                 //controlService.sendData(myArray);
                                 if(puzzle.checkWord()){
                                     puzzle.calculateScore(puzzle.getMatches(),puzzle.getNotMatchesWords());
-                                    controlService.getFinishedRound().set(true);
 
+                                    controlService.getFinishedRound().set(true);
                                     for(JLabel elem: controlService.getWrittenLabels()){
                                         elem.setBorder(BorderFactory.createLineBorder(Color.GREEN));
                                     }
@@ -499,13 +496,17 @@ public class ControlService {
                                     if(user2==null){
                                         congratulations(user1);
                                         FileService.writeScore(user1);
+                                        user1.setWin(true);
+                                        FileService.writeStatistic(user1);
                                     }else{
                                         if(user1.getIsActive().get()){
                                             congratulations(user1);
                                             FileService.writeScore(user1);
+                                            FileService.writeStatistic(user1);
                                         }else{
                                             congratulations(user2);
                                             FileService.writeScore(user2);
+                                            FileService.writeStatistic(user1);
                                         }
                                     }
                                 }else{
@@ -530,14 +531,20 @@ public class ControlService {
                                     if(user2==null){
                                         looseMessage(user1);
                                         controlService.getFinishedRound().set(true);
+                                        user1.setWin(false);
+                                        FileService.writeStatistic(user1);
                                     }else{
                                         if(user1.getIsActive().get()){
                                             looseMessage(user1);
                                             controlService.getFinishedRound().set(true);
+                                            user1.setWin(false);
+                                            FileService.writeStatistic(user1);
                                         }else{
                                             //TODO 2. oyuncunun skorunu düzelt
                                             looseMessage(user2);
                                             controlService.getFinishedRound().set(true);
+                                            user2.setWin(false);
+                                            FileService.writeStatistic(user2);
                                         }
                                     }
                                 }
@@ -590,10 +597,16 @@ public class ControlService {
 
     private void sendData(JLabel [] myArray,DataOutputStream dOut) {
             while(true){
+                //TODO burada bug var
                 byte [] message= Arrays.stream(myArray).map(e->e.getText().getBytes(StandardCharsets.UTF_8)[0]).collect(toByteArray());
+                //String [] messageString= Arrays.stream(myArray).map(e->e.getText()).toArray(String[]::new);
                 try {
-                    dOut.writeInt(myArray.length);
-                    dOut.write(message);
+                    dOut.writeInt(message.length);
+//                    for(int i=0;i<messageString.length;i++){
+//                        dOut.writeUTF(messageString[i]);
+//                    }
+                    //dOut.writeUTF(messageString);
+                    dOut.write(message); //burası önemli
 //                    for(int i=0;i<message.length;i++){
 //                        System.out.println(String.valueOf(message[i]));
 //                    }
@@ -735,6 +748,7 @@ public class ControlService {
     }
 
     private static void looseMessage(User user) {
+        //BURALAR DOSYADAN OKUNACAK...
         StringBuilder builder=new StringBuilder();
         builder.append("Üzgünüz \n");
         builder.append("Kullanıcı: "+user.getUserName()+" \n");
