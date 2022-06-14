@@ -38,19 +38,19 @@ public class WordleGameWithMouse extends JFrame implements SingleWordleGame {
         ControlService controlService=new ControlService();
         //label'ların olduğu dizi
         Point labelsStartPoint=new Point(200,10);
-        JLabel [] myArray =controlService.createLabelsForMouse(jFrame,controlService,labelsStartPoint);
+        JLabel [] labels =controlService.createLabelsForMouse(jFrame,controlService,labelsStartPoint);
 
         jFrame.setTitle("Wordle Game");
         jFrame.setSize(800,800);
         jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         Point buttonsStartPoint=new Point(80,350);
         JButton[] buttons=new JButton[31];
-        buttons=ControlService.createButtonsForMouse(myArray,buttonsStartPoint,buttons,jFrame,controlService,puzzle,user,null);
+        buttons=ControlService.createButtonsForMouse(labels,buttonsStartPoint,buttons,jFrame,controlService,puzzle,user,null);
         user.getIsActive().set(true);
         ControlService.createUserInformations(jFrame,controlService,user,null);
         //TODO Eğer ziyaretçi varsa onun bağlanmasını bekliyor
         if(hasVisitor)
-            controlService.createSocketServer(myArray);
+            controlService.createSocketServer(labels);
         jFrame.setLayout(null);
     }
 

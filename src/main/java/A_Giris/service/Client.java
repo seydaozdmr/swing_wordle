@@ -2,15 +2,13 @@ package A_Giris.service;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.Socket;
 
 public class Client extends JFrame {
     public static Socket socket;
-    private static JLabel [] myArray =new JLabel[25];
+    private static JLabel [] labels =new JLabel[25];
 
     public static void main(String[] args) {
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -36,7 +34,7 @@ public class Client extends JFrame {
         setSize(800 ,800);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         Point labelsStartPoint=new Point(200,10);
-        myArray = controlService.createLabelsForKeyBoard(this,labelsStartPoint);
+        labels = controlService.createLabelsForKeyBoard(this,labelsStartPoint);
         setLayout(null);
 
     }
@@ -61,12 +59,12 @@ public class Client extends JFrame {
                         message = new byte[length];
                         dIn.readFully(message);
                         for (int i = 0; i < message.length; i++) {
-                            if(myArray[1]!=null && message[i]!=32){
-                                myArray[i].setText(String.valueOf((char)message[i]));
+                            if(labels[1]!=null && message[i]!=32){
+                                labels[i].setText(String.valueOf((char)message[i]));
                             }
                         }
                         try {
-                            Thread.sleep(5000);
+                            Thread.sleep(2000);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }

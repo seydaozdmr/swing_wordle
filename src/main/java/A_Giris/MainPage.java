@@ -11,9 +11,11 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+//TODO burası ana ekran, JFrame
 public class MainPage extends JFrame{
-    public static void main(String[] args) {
 
+    public static void main(String[] args) {
+        //TODO kuyruğa bu runnable'ı atıyor
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -31,9 +33,11 @@ public class MainPage extends JFrame{
         JPanel panel = new JPanel();
         panel.setBorder(new EmptyBorder(5,5,5,5));
 
+        //Jframe'e paneli veriyorum
         setContentPane(panel);
         panel.setLayout(null);
 
+        //TODO iki tane kullanıcı adı alıyorum (single'da bir tane)
         JTextField userName= new JFormattedTextField();
         userName.setBounds(150,230,250,30);
         panel.add(userName);
@@ -43,26 +47,34 @@ public class MainPage extends JFrame{
         userName2.setEditable(false);
         panel.add(userName2);
 
-        //TODO fare klavye
+        //TODO fare ya da klavye ile nasıl oynanacaksa o seçiliyor
         JRadioButton rb1=new JRadioButton("Fare",true);
         rb1.setActionCommand("f");
         rb1.setBounds(150,100,250,20);
         JRadioButton rb2=new JRadioButton("Klavye");
         rb2.setActionCommand("k");
         rb2.setBounds(150,120,250,20);
+
+        ButtonGroup bg= new ButtonGroup();
+        bg.add(rb1);
+        bg.add(rb2);
+
         //TODO single - multiplayer
         JRadioButton rbSingle= new JRadioButton("Single Player",true);
         rbSingle.setActionCommand("s");
         rbSingle.setBounds(150,140,250,20);
+
         rbSingle.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 userName2.setEditable(false);
             }
         });
+
         JRadioButton rbMultiPlayer= new JRadioButton("MultiPlayer");
         rbMultiPlayer.setActionCommand("m");
         rbMultiPlayer.setBounds(150,160,250,20);
+
         rbMultiPlayer.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -70,9 +82,12 @@ public class MainPage extends JFrame{
             }
         });
 
+        //TODO socket ile ağdan izlemek üzere kontrol yapıyor
         JCheckBox checkBox1 = new JCheckBox("Ziyaretçi");
         checkBox1.setBounds(150,180, 150,20);
         panel.add(checkBox1);
+
+        //TODO burası single player ve multiplayer buttonlarının bağlı olduğu grup
         ButtonGroup bg2= new ButtonGroup();
         bg2.add(rbSingle);
         bg2.add(rbMultiPlayer);
@@ -85,13 +100,12 @@ public class MainPage extends JFrame{
         panel.add(o1);
         panel.add(o2);
 
-        ButtonGroup bg= new ButtonGroup();
-        bg.add(rb1);
-        bg.add(rb2);
+
 
         JButton button=new JButton("Başla");
         button.setBounds(150,340,100,30);
 
+        //TODO başla butonuna basıldığında olacak olan olaylar
         button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -114,20 +128,23 @@ public class MainPage extends JFrame{
                             gameUser.setGameControls(GameControls.KEYBOARD);
                         }
                         //TODO Oynama şekli klavye fare belirlenecek?
-                        WordlGameFactory factory=new WordleGameFactoryWithKeyboard();
-                        WordlGameFactory mauseFactory=new WordleGameFactoryWithMouse();
+                        //TODO burada belirlenen özelliklere göre (fare-klavye, single-multi, visitor?) oyun yaratılıyor
+                        //TODO Abstract Factory tasarım kalıbı
+                        WordlGameFactory keyboardFactory = new WordleGameFactoryWithKeyboard();
+                        WordlGameFactory mouseFactory = new WordleGameFactoryWithMouse();
                         if(gameUser.getGameControls()==GameControls.KEYBOARD && bg2.getSelection().getActionCommand().charAt(0)=='s'){
+                            //TODO bir oyuncu oynayacağı için burada onu aktifleştiriyorum
                             gameUser.getIsActive().set(true);
-                            WordleGameWithKeyboard wordleGameWithKeyboard = (WordleGameWithKeyboard) factory.createSingleWordleGame(gameUser,checkBox1.isSelected());
+                            WordleGameWithKeyboard wordleGameWithKeyboard = (WordleGameWithKeyboard) keyboardFactory.createSingleWordleGame(gameUser,checkBox1.isSelected());
                             wordleGameWithKeyboard.setVisible(true);
                         }else if(gameUser.getGameControls()==GameControls.MOUSE && bg2.getSelection().getActionCommand().charAt(0)=='s'){
-                            WordleGameWithMouse wordleGameWithMouse=(WordleGameWithMouse) mauseFactory.createSingleWordleGame(gameUser,checkBox1.isSelected());
+                            WordleGameWithMouse wordleGameWithMouse=(WordleGameWithMouse) mouseFactory.createSingleWordleGame(gameUser,checkBox1.isSelected());
                             wordleGameWithMouse.setVisible(true);
                         }else if(gameUser.getGameControls()==GameControls.KEYBOARD && bg2.getSelection().getActionCommand().charAt(0)=='m'){
-                            MultiplayerWordleGameWithKeyboard multiplayerWordleGameWithKeyboard=(MultiplayerWordleGameWithKeyboard) factory.createMultiplayerWordleGame(gameUser,gameUser2,checkBox1.isSelected());
+                            MultiplayerWordleGameWithKeyboard multiplayerWordleGameWithKeyboard=(MultiplayerWordleGameWithKeyboard) keyboardFactory.createMultiplayerWordleGame(gameUser,gameUser2,checkBox1.isSelected());
                             multiplayerWordleGameWithKeyboard.setVisible(true);
                         }else if(gameUser.getGameControls()==GameControls.MOUSE && bg2.getSelection().getActionCommand().charAt(0)=='m'){
-                            MultiPlayerWordleGameWithMouse multiPlayerWordleGameWithMouse=(MultiPlayerWordleGameWithMouse) mauseFactory.createMultiplayerWordleGame(gameUser,gameUser2,checkBox1.isSelected());
+                            MultiPlayerWordleGameWithMouse multiPlayerWordleGameWithMouse=(MultiPlayerWordleGameWithMouse) mouseFactory.createMultiplayerWordleGame(gameUser,gameUser2,checkBox1.isSelected());
                             multiPlayerWordleGameWithMouse.setVisible(true);
                         }
                         dispose();

@@ -31,19 +31,26 @@ public class ControlService {
     private int labelCounter=0;
     private StringBuilder builder=new StringBuilder();
     private List<JLabel> writtenLabels= new ArrayList<>();
+
     private AtomicInteger count = new AtomicInteger(0);
     private AtomicBoolean finishedRound = new AtomicBoolean(false);
     private AtomicInteger roundCounter=new AtomicInteger(0);
-    public AtomicInteger getRoundCounter() {
-        return roundCounter;
-    }
+
     private static int [] keyboard=  {69,82,84,89,85,73,79,80,286,220,65,83,68,70,71,72,74,75,76,350,304,10,90,67,86,66,78,77,214,199,8};
     private static int [] lowerKeyboard= {101,114,116,121,117,305,111,112,287,252,97,115,100,102,103,104,106,107,108,351,105,10,122,120,99,118,98,110,109,246,231,8};
     private Timer timer=new Timer();
-    private static AtomicBoolean isSwitch=new AtomicBoolean(false);
+    private static AtomicBoolean isSwitch = new AtomicBoolean(false);
+
     private static ServerSocket serverSocket;
     private static Socket socket;
 
+
+
+
+
+    public AtomicInteger getRoundCounter() {
+        return roundCounter;
+    }
     public void setRoundCounter(AtomicInteger roundCounter) {
         this.roundCounter = roundCounter;
     }
@@ -267,15 +274,18 @@ public class ControlService {
     public static JButton[] createButtonsForMouse(JLabel[] myArray,Point buttonsStartPoint,JButton[] buttons, JFrame jFrame, ControlService controlService, WordlPuzzle puzzle,User user1,User user2){
         int x=buttonsStartPoint.x;
         int y=buttonsStartPoint.y;
+        //TODO burada altta bulunan timer thread'i çalıştırıyor
         createTimerThread(user1,user2,controlService);
-
         for(int i=0;i<31;i++){
+            //TODO ilk sıra
             if(i<=9){
                 buttons[i] = new JButton(String.valueOf((char) keyboard[i]));
                 buttons[i].setBounds(x + i*50,y,50,30);
                 buttons[i].setLocale(Locale.getDefault());
+
                 JButton temp=buttons[i];
                 buttons[i].setTransferHandler(new ValueExportTransferHandler(temp.getText()));
+
                 buttons[i].addMouseMotionListener(new MouseAdapter() {
                     @Override
                     public void mouseDragged(MouseEvent e) {
@@ -286,6 +296,7 @@ public class ControlService {
                 });
                 jFrame.add(buttons[i]);
             }else{
+                //TODO ikinci sıra
                 if(i<=20){
                     buttons[i] =new JButton(String.valueOf((char) keyboard[i]));
                     buttons[i].setBounds(x + (i-10)*50 ,y+50,50,30);
@@ -302,6 +313,7 @@ public class ControlService {
                     });
                     jFrame.add( buttons[i]);
                 }else{
+                    //TODO 10 enter - > 8 backspace silme
                     if(!(keyboard[i]==10) && !(keyboard[i]==8)){
                         buttons[i] =new JButton(String.valueOf((char) keyboard[i]));
                         buttons[i].setBounds(x+ (i-21)*50,y+100,50,30);
@@ -335,22 +347,27 @@ public class ControlService {
                         buttons[i].addActionListener(new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent e) {
+                                //TODO eğer 5 tane harf girildeyse ve oyun bitmediyse
                                 if(controlService.getCount().get()==5 && !controlService.getFinishedRound().get()){
                                     //TODO Girilen her kelime sonrası kelimenin kontrol edilmesi
                                     controlService.getRoundCounter().incrementAndGet();
+                                    //TODO enter'a bastıktan sonra counter'ı sıfırlamam lazım
                                     controlService.getCount().set(0);
+                                    //TODO puzzle'a girilen harfleri gönderiyorum
                                     puzzle.addWord(controlService.getBuilder().toString());
+                                    //TODO puzzle'a gidince tempteki labeller temizler
                                     controlService.removeTempLabels();
+                                    //TODO Uygulamanın seçtiği kelime ile benim girdiğim kelime karşılaştırılıyor.
                                     if(puzzle.checkWord()){
                                         puzzle.calculateScore(puzzle.getMatches(),puzzle.getNotMatchesWords());
                                         controlService.getFinishedRound().set(true);
-
                                         for(JLabel elem: controlService.getWrittenLabels()){
                                             elem.setBorder(BorderFactory.createLineBorder(Color.GREEN));
                                         }
                                         //Eğer doğru bilinmiş ise tebrik ediyor ve skoru dosyaya yazıyor
                                         if(user2==null){
                                             congratulations(user1);
+                                            //TODO bu skoru eğer en büyük skorsa dosyaya yazan method
                                             FileService.writeScore(user1);
                                         }else{
                                             if(user1.getIsActive().get()){
@@ -399,6 +416,7 @@ public class ControlService {
                             }
                         });
                         jFrame.add(buttons[i]);
+                        //TODO son olarak backspace buttonun yaratıyorum
                     }else if(keyboard[i]==8){
                         //TODO BACKSPACE tuşu
                         buttons[i] =new JButton("<-");
@@ -411,10 +429,13 @@ public class ControlService {
                                     if(controlService.getLabelCounter()>0 && (lastModified = controlService.getLastJLabel())!=null && controlService.getWrittenLabels().size()>0)
                                     {
                                         lastModified.setText(" ");
+                                        //TODO 4 tane harf girildi bunu sildikten sonra girilmiş harf sayısını 1 azaltıyorum
                                         controlService.getCount().decrementAndGet();
                                         if(controlService.getBuilder().length()>0){
+                                            //TODO silinen hafri builder'dan da siliyorum
                                             controlService.getBuilder().deleteCharAt(controlService.getBuilder().length()-1);
                                         }
+                                        //TODO yazılmış labellar içinden siliyorum
                                         controlService.getWrittenLabels().remove( controlService.getWrittenLabels().size()-1);
                                     }
                                 }catch (NullPointerException ex){
@@ -447,6 +468,7 @@ public class ControlService {
                     @Override
                     public void keyTyped(KeyEvent e) {
                     }
+                    //TODO klavyenin tuşuna basıldığında çalışıyor
                     @Override
                     public void keyPressed(KeyEvent e) {
                         //TODO oyun bittiğinde yeni bir event alma game is over...
@@ -521,21 +543,26 @@ public class ControlService {
                                             }
                                         }
                                     }
-                                    //sıra diğer kullanıcıya geçer.
+                                    //TODO sıra diğer kullanıcıya geçer.
                                     isSwitch.set(true);
                                     puzzle.calculateScore(puzzle.getMatches(),puzzle.getNotMatchesWords());
                                     System.out.println("skor : "+user1.getScore());
                                 }
+                                //TODO kontrol edilen kelimeyi builder'dan siliyorum
                                 controlService.getBuilder().delete(0,5);
+                                //TODO yazılmış labelları temizliyorum
                                 controlService.getWrittenLabels().clear();
+                                //TODO 5 kere kelime girdim 5'inde de bilemedim o zaman oyun yine bitiyor
                                 if (controlService.getRoundCounter().get() == 5) {
                                     puzzle.calculateScore(puzzle.getMatches(),puzzle.getNotMatchesWords());
+                                    //TODO kullanıcı 2 null ise bu single player
                                     if(user2==null){
                                         user1.setWin(false);
                                         FileService.writeStatistic(user1);
                                         looseMessage(user1);
                                         controlService.getFinishedRound().set(true);
                                     }else{
+                                        //TODO burası multiplayer ise çalışacak
                                         if(user1.getIsActive().get()){
                                             user1.setWin(false);
                                             FileService.writeStatistic(user1);
@@ -547,7 +574,6 @@ public class ControlService {
                                             FileService.writeStatistic(user2);
                                             looseMessage(user2);
                                             controlService.getFinishedRound().set(true);
-
                                         }
                                     }
                                 }
@@ -560,7 +586,6 @@ public class ControlService {
                 });
                 jFrame.add(buttons[i]);
             }else{
-
                 if(i<=20){
                     buttons[i] =new JButton(String.valueOf((char) keyboard[i]));
                     buttons[i].setBounds(x + (i-10)*50 ,y+50,50,30);
@@ -595,7 +620,6 @@ public class ControlService {
             }
         }
         return buttons;
-
     }
 
     private void sendData(JLabel [] myArray,DataOutputStream dOut) {
@@ -628,7 +652,6 @@ public class ControlService {
 
 
     }
-
 
     public static Collector<Byte, ?, byte[]> toByteArray() {
         return Collector.of(ByteArrayOutputStream::new, ByteArrayOutputStream::write, (baos1, baos2) -> {

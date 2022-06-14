@@ -16,6 +16,7 @@ public class FileService {
 //    }
 
 
+    //TODO write score ve read score high scoru yazıyor ve okuyor
     public static void writeScore(User user){
         String userDetails=user.getUserName()+","+user.getScore();
         char[] userDetailsChar= userDetails.toCharArray();

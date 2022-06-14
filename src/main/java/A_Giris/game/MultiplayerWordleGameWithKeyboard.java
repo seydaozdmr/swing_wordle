@@ -45,6 +45,7 @@ public class MultiplayerWordleGameWithKeyboard extends JFrame implements MultiPl
         jFrame.setTitle("MultiPlayer Wordle Game");
         jFrame.setSize(800 ,800);
         jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        //TODO oyuna ilk başlayacak kişiyi random seçiyoruz
         int chooseActiveUser= new Random().nextInt(2);
 
         if(chooseActiveUser==0){

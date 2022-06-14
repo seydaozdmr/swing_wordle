@@ -3,7 +3,7 @@ package A_Giris.game;
 import A_Giris.model.User;
 
 public class WordleGameFactoryWithKeyboard implements WordlGameFactory{
-
+    //TODO klavye ile oynanacak oyunları yaratıyor
 
     @Override
     public SingleWordleGame createSingleWordleGame(User user,boolean hasVisitor) {

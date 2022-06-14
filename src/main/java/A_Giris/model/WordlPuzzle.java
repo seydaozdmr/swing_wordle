@@ -40,8 +40,10 @@ public class WordlPuzzle {
         matches = new boolean[5];
         notMatchesWords = new boolean[5];
         notFoundChars.clear();
+
         boolean result = true;
         char[] chosen = chosenWord.toCharArray();
+
         for (int i = 0; i < 5; i++) {
             if (word[i] == chosen[i]) {
                 matches[i] = true;
@@ -50,6 +52,7 @@ public class WordlPuzzle {
                 result = false;
             }
         }
+
         for (int i = 0; i < 5; i++) {
             if (!matches[i]) {
                 for (int j = 0; j < 5; j++) {
@@ -83,6 +86,7 @@ public class WordlPuzzle {
                 }
 
             }
+            //TODO yeri yanlış ama kelime içinde varsa (sarı)
             if(notMatchesWords[i]){
                 if(user1.getIsActive().get()){
                     user1.setScore(user1.getScore()-5);
@@ -93,6 +97,7 @@ public class WordlPuzzle {
                 }
 
             }
+            //TODO hiç bulamazsa 20 puan düşüyoruz
             if(!matches[i] && !notMatchesWords[i]){
                 if(user1.getIsActive().get()){
                     user1.setScore(user1.getScore()-20);
